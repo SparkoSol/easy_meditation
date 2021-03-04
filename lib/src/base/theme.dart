@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 /// used inside the application repeatedly must be placed here to reduce
 /// redundancy (i.e. improve code-quality and debugging)
 abstract class AppTheme {
+  static const primaryColor = Color(0xFFDE9600);
+
   /// Dark Theme of [App]
   static final dark = ThemeData(
     brightness: Brightness.dark,
@@ -13,6 +15,7 @@ abstract class AppTheme {
 
   /// Light Theme of [App]
   static final light = ThemeData(
+    primaryColor: primaryColor,
     brightness: Brightness.light,
     inputDecorationTheme: InputDecorationTheme(
       isDense: true,

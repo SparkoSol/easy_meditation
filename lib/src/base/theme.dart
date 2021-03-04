@@ -9,6 +9,8 @@ abstract class AppTheme {
   static const primaryColor = Color(0xFFDE9600);
   static const primaryColor1 = Color(0xFFF1DEB8);
 
+  static const darkBlueColor = Color(0xFF092C47);
+
   /// Dark Theme of [App]
   static final dark = ThemeData(
     brightness: Brightness.dark,

@@ -19,6 +19,7 @@ abstract class AppTheme {
   /// Light Theme of [App]
   static final light = ThemeData(
     primaryColor: primaryColor,
+    scaffoldBackgroundColor: Colors.white,
     textTheme: TextTheme(bodyText1: TextStyle(color: Color(0xFF707070))),
     brightness: Brightness.light,
     inputDecorationTheme: InputDecorationTheme(

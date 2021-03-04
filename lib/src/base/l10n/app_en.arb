@@ -1,3 +1,10 @@
 {
-  "@@locale": "en"
+  "@@locale": "en",
+
+  "welcomeMessage1": "",
+  "@welcomeMessage1": {},
+  "welcomeMessage2": "",
+  "@welcomeMessage2": {},
+  "welcomeMessage3": "",
+  "@welcomeMessage3": {}
 }

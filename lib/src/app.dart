@@ -3,7 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'base/theme.dart';
 import 'base/config.dart';
-import 'ui/pages/home.dart';
+import 'ui/pages/home_page.dart';
 
 class App extends StatefulWidget {
   const App._();

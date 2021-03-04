@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 /// redundancy (i.e. improve code-quality and debugging)
 abstract class AppTheme {
   static const primaryColor = Color(0xFFDE9600);
+  static const primaryColor1 = Color(0xFFF1DEB8);
 
   /// Dark Theme of [App]
   static final dark = ThemeData(
@@ -16,10 +17,11 @@ abstract class AppTheme {
   /// Light Theme of [App]
   static final light = ThemeData(
     primaryColor: primaryColor,
+    textTheme: TextTheme(bodyText1: TextStyle(color: Color(0xFF707070))),
     brightness: Brightness.light,
     inputDecorationTheme: InputDecorationTheme(
       isDense: true,
       border: OutlineInputBorder(),
-    )
+    ),
   );
 }

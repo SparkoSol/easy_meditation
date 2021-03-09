@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 /// task is to be executed i.e. showing dialog before execution and closing
 /// dialog after successful execution, it also handles errors during execution.
 abstract class LazyTaskService {
-  static Widget? _dialog;
+  static Widget _dialog;
 
   static set dialog(Widget dialog) => _dialog = dialog;
 
@@ -21,18 +21,18 @@ abstract class LazyTaskService {
   /// user can handle the error more specifically.
   ///
   /// [errorBuilder] will be opened, if provided, whenever an error occurs.
-  static Future<T?> execute<T>(
+  static Future<T> execute<T>(
     BuildContext context,
     _LazyTask task, {
-    Widget? dialog,
+    Widget dialog,
     bool throwError = false,
-    _ErrorBuilder? errorBuilder,
+    _ErrorBuilder errorBuilder,
   }) async {
     if (dialog == null) dialog = _dialog;
     if (dialog == null) throw 'No LoadingDialog was registered';
 
-    late T data;
-    showDialog(context: context, builder: (context) => dialog!);
+    T data;
+    showDialog(context: context, builder: (context) => dialog);
     try {
       data = await task();
       Navigator.of(context).pop();
@@ -50,4 +50,4 @@ abstract class LazyTaskService {
 }
 
 typedef _ErrorBuilder = Widget Function(dynamic);
-typedef _LazyTask<T> = Future<T?> Function();
+typedef _LazyTask<T> = Future<T> Function();

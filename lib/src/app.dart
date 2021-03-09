@@ -1,3 +1,4 @@
+import 'package:easy_meditation/src/base/pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -34,11 +35,12 @@ class _AppState extends State<App> {
     final config = AppConfig();
 
     return MaterialApp(
-      home: HomePage(),
       theme: AppTheme.light,
       locale: config.locale,
+      routes: AppPages.routes,
       darkTheme: AppTheme.dark,
       themeMode: config.themeMode,
+      initialRoute: AppPages.splash.route,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
     );

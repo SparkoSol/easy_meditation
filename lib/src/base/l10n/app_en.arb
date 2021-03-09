@@ -1,10 +1,17 @@
 {
   "@@locale": "en",
 
-  "welcomeMessage1": "",
+  "welcomeMessage1": "Overcome all that binds and constraints us",
   "@welcomeMessage1": {},
-  "welcomeMessage2": "",
+  "welcomeMessage2": "Show your mind and body some love",
   "@welcomeMessage2": {},
-  "welcomeMessage3": "",
-  "@welcomeMessage3": {}
+  "welcomeMessage3": "Easy and enjoyable that also brings you joy",
+  "@welcomeMessage3": {},
+
+  "skip": "Skip",
+  "@skip": {},
+  "next": "Next",
+  "@next": {},
+  "getStarted": "GetStarted",
+  "@getStarted": {}
 }

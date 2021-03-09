@@ -15,7 +15,7 @@ class AppConfig extends ChangeNotifier {
   factory AppConfig() => _instance;
   static final _instance = AppConfig._();
 
-  ThemeMode _themeMode = ThemeMode.system;
+  ThemeMode _themeMode = ThemeMode.light;
   Locale _locale = Locale('en');
 
   ThemeMode get themeMode => _themeMode;

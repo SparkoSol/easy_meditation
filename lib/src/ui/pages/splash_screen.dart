@@ -1,3 +1,4 @@
+import 'package:easy_meditation/src/ui/modals/notifications_management.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -37,20 +38,21 @@ class _SplashScreenState extends State<SplashScreen>
       curve: Interval(0.6, 1, curve: Curves.ease),
     ));
 
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      controller.addStatusListener((status) async {
-        if (status == AnimationStatus.completed) {
-          await Future.delayed(Duration(milliseconds: 500), () {});
-          Navigator.of(context).pushReplacementNamed('/welcome');
-        }
-      });
-
-      controller.forward();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //   controller.addStatusListener((status) async {
+    //     if (status == AnimationStatus.completed) {
+    //       await Future.delayed(Duration(milliseconds: 500), () {});
+    //       Navigator.of(context).pushReplacementNamed('/welcome');
+    //     }
+    //   });
+    //
+    //   controller.forward();
+    // });
   }
 
   @override
   Widget build(BuildContext context) {
+    return ReminderManagementPage();
     return Material(
       color: Colors.white,
       child: AnimatedBuilder(
@@ -60,6 +62,7 @@ class _SplashScreenState extends State<SplashScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              /// TODO: Fix image paths.
               Image.asset(
                 'assets/images/buddi logo (1).png',
                 width: MediaQuery.of(context).size.width * scale2.value,

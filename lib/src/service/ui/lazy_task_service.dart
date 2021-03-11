@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 /// task is to be executed i.e. showing dialog before execution and closing
 /// dialog after successful execution, it also handles errors during execution.
 abstract class LazyTaskService {
-  static Widget _dialog;
+  static Widget _dialog = Dialog(
+    child: Text('loading'),
+  );
 
   static set dialog(Widget dialog) => _dialog = dialog;
 

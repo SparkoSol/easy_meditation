@@ -13,5 +13,20 @@
   "next": "Next",
   "@next": {},
   "getStarted": "GetStarted",
-  "@getStarted": {}
+  "@getStarted": {},
+
+  "notificationsTitle": "Notifications",
+  "@notificationsTitle": {},
+  "notificationsReminder": "Turn on reminder",
+  "@notificationsReminder": {},
+  "notificationsChooseTime": "Choose Time",
+  "@notificationsChooseTime": {},
+  "notificationsTimeHeader": "What time would you like to meditate?",
+  "@notificationsTimeHeader": {},
+  "notificationsTimeDetail": "Any time you can choose but\nWe recommend first thing in the morning.",
+  "@notificationsTimeDetail": {},
+  "notificationsDayHeader": "What day would you like to meditate?",
+  "@notificationsDayHeader": {},
+  "notificationsDayDetail": "Everyday is best, but we recommend picking\nat least five.",
+  "@notificationsDayDetail": {}
 }

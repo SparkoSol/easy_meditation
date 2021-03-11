@@ -1,4 +1,6 @@
+import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/base/pages.dart';
+import 'package:easy_meditation/src/service/ui/notifications_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -14,6 +16,11 @@ class App extends StatefulWidget {
   /// All the required services (both sync and async) must be initialized before
   /// calling [runApp].
   static Future<void> initializeAndRun() async {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    await AppData.initiate();
+    await NotificationsService.initialize();
+
     return runApp(const App._());
   }
 

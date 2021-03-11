@@ -22,7 +22,7 @@ abstract class AppPages {
     signUp.route: (context) => RegisterPage(),
     splash.route: (context) => SplashScreen(),
     welcome.route: (context) => WelcomePage(),
-    notificationsSettings.route: (context) => NotificationsManagement(),
+    notificationsSettings.route: (context) => ReminderManagementPage(),
   };
 
   static const splash = AppPage._('/splash');

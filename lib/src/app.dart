@@ -47,7 +47,6 @@ class _AppState extends State<App> {
       routes: AppPages.routes,
       darkTheme: AppTheme.dark,
       themeMode: config.themeMode,
-      initialRoute: AppPages.splash.route,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
     );

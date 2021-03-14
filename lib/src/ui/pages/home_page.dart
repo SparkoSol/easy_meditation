@@ -1,21 +1,10 @@
-import 'package:easy_meditation/generated/XDMobile12columns1.dart';
-import 'package:easy_meditation/generated/XDMobile12columns4.dart';
-import 'package:easy_meditation/generated/XDMobile12columns7.dart';
-import 'package:easy_meditation/generated/XDUserinput.dart';
-import 'package:easy_meditation/src/base/assets.dart';
-import 'package:easy_meditation/src/base/theme.dart';
-import 'package:easy_meditation/src/ui/modals/notifications_management.dart';
-import 'package:easy_meditation/src/ui/modals/payment_bottom_sheet.dart';
-import 'package:easy_meditation/src/ui/pages/about_us_page.dart';
-import 'package:easy_meditation/src/ui/pages/audio_player_page.dart';
-import 'package:easy_meditation/src/ui/pages/course_detail.dart';
-import 'package:easy_meditation/src/ui/pages/login_page.dart';
-import 'package:easy_meditation/src/ui/pages/welcome_page.dart';
-import 'package:easy_meditation/src/ui/views/home_view.dart';
-import 'package:easy_meditation/src/ui/views/payment/payment_info_view.dart';
-import 'package:easy_meditation/src/ui/views/preferences_view.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:easy_meditation/src/base/theme.dart';
+import 'package:easy_meditation/src/base/assets.dart';
+import 'package:easy_meditation/src/ui/views/home_view.dart';
+import 'package:easy_meditation/src/ui/pages/course_detail.dart';
+import 'package:easy_meditation/src/ui/views/preferences_view.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -24,10 +13,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var _selectedIndex = 0;
+  static final pageController = PageController();
+  static final controller = CourseDetailPageController();
 
   final _pages = <Widget>[
-    HomeView(),
-    CourseDetailPage(),
+    HomeView(pageController, controller),
+    CourseDetailPage(controller),
     PreferencesView(),
   ];
 
@@ -35,13 +26,23 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      body: _pages[_selectedIndex],
-
+      body: PageView(
+        children: _pages,
+        controller: pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        physics: NeverScrollableScrollPhysics(),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         backgroundColor: Colors.white,
         type: BottomNavigationBarType.fixed,
-        onTap: (index) => setState(() => _selectedIndex = index),
+        onTap: (index) {
+          pageController.jumpToPage(index);
+        },
         selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
         items: [
           _bottomNavBarItem(

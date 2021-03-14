@@ -1,8 +1,12 @@
 import 'package:easy_meditation/src/base/theme.dart';
+import 'package:easy_meditation/src/models/module.dart';
 import 'package:easy_meditation/src/ui/pages/audio_player_page.dart';
 import 'package:flutter/material.dart';
 
 class ModuleWidget extends StatelessWidget {
+  final Module module;
+  ModuleWidget(this.module);
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -11,7 +15,7 @@ class ModuleWidget extends StatelessWidget {
         ListTile(
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => AudioPlayerPage(),
+              builder: (context) => AudioPlayerPage(module),
             ));
           },
           leading: Container(
@@ -23,9 +27,9 @@ class ModuleWidget extends StatelessWidget {
             ),
             child: Icon(Icons.play_arrow, color: AppTheme.primaryColor),
           ),
-          title: Text('Module 1'),
-          subtitle: Text('Advanced Course'),
-          trailing: Text('10 min'),
+          title: Text(module.name),
+          subtitle: Text(Module.courses[module.courseNumber]),
+          trailing: Text(module.length.toString()),
         ),
         Container(
           height: 1,

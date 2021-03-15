@@ -26,16 +26,18 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
-  dio: ^3.0.10
-  retrofit:
+  dio:
+#  retrofit:
   json_annotation: ^3.1.1
   just_audio: ^0.7.1
   shared_preferences:
   pretty_dio_logger:
   flutter_local_notifications: 5.0.0-nullsafety.1
   adobe_xd:
-
-
+  firebase_core: ^1.0.1
+  firebase_auth: ^1.0.1
+  google_sign_in: ^5.0.0
+  flutter_facebook_login: ^3.0.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
@@ -45,7 +47,7 @@ dev_dependencies:
     sdk: flutter
   build_runner:
   json_serializable:
-  retrofit_generator:
+#  retrofit_generator:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

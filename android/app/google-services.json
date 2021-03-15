@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "325060394764",
+    "project_id": "easy-meditation-d74f8",
+    "storage_bucket": "easy-meditation-d74f8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:325060394764:android:f0d67aaaaa989319481329",
+        "android_client_info": {
+          "package_name": "com.example.easy_meditation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "325060394764-neokmpgdjcetks63favocevhis5omjlc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.easy_meditation",
+            "certificate_hash": "aacc0af32e655c168bb8f69dd7797417ba1bb9ec"
+          }
+        },
+        {
+          "client_id": "325060394764-nqmdkeqaa3sr3s4nkmsp26sv8h3mmj2v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPyDPzb9iiFtKYm4edUi5lx21U86J6wc0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "325060394764-nqmdkeqaa3sr3s4nkmsp26sv8h3mmj2v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,7 @@
+import 'package:easy_meditation/src/base/assets.dart';
 import 'package:easy_meditation/src/base/pages.dart';
 import 'package:easy_meditation/src/base/theme.dart';
+import 'package:easy_meditation/src/service/auth/auth_service.dart';
 import 'package:easy_meditation/src/service/ui/navigation_service.dart';
 import 'package:easy_meditation/src/ui/views/imaged_view.dart';
 import 'package:easy_meditation/src/ui/widgets/text_field.dart';
@@ -43,50 +45,91 @@ class LoginPage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pushReplacementNamed('/');
               },
-              child: Text('LOGIN', style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),),
+              child: Text(
+                'LOGIN',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
               style: TextButton.styleFrom(
                 backgroundColor: Colors.white,
                 primary: AppTheme.primaryColor,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)
-                ),
+                    borderRadius: BorderRadius.circular(15)),
                 minimumSize: Size.fromHeight(55),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(10),
-              child: Text('OR SIGN UP WITH', style: TextStyle(color: Colors.grey.shade700)),
+              child: Text('OR SIGN UP WITH',
+                  style: TextStyle(color: Colors.grey.shade700)),
             ),
             Row(
               children: [
-                Container(
-                  width: 55,
-                  height: 55,
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration:
-                  BoxDecoration(color: Color(0xFF7583CA), shape: BoxShape.circle),
+                GestureDetector(
+                  onTap: () async {
+                    await SocialLoginService.facebookAuth((result) {
+                      print('RRRRRRRRRRRRRRRRRRRRr');
+                      print('RRRRRRRRRRRRRRRRRRRRr');
+                      print(result.uid);
+                      print(result.email);
+                      print('RRRRRRRRRRRRRRRRRRRRr');
+                      print('RRRRRRRRRRRRRRRRRRRRr');
+                    });
+                  },
+                  child: Container(
+                    width: 55,
+                    height: 55,
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Color(0xFF7583CA),
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: AssetImage(Assets.facebookIcon),
+                      ),
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    await SocialLoginService.googleAuth((result) {
+                      print('RRRRRRRRRRRRRRRRRRRRr');
+                      print('RRRRRRRRRRRRRRRRRRRRr');
+                      print(result.uid);
+                      print(result.email);
+                      print('RRRRRRRRRRRRRRRRRRRRr');
+                      print('RRRRRRRRRRRRRRRRRRRRr');
+                    });
+                  },
+                  child: Container(
+                    width: 55,
+                    height: 55,
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: AssetImage(Assets.googleIcon),
+                      ),
+                    ),
+                  ),
                 ),
                 Container(
                   width: 55,
                   height: 55,
                   margin: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration:
-                  BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                ),
-                Container(
-                  width: 55,
-                  height: 55,
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration:
-                  BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: AssetImage(Assets.appleIcon),
+                    ),
+                  ),
                 ),
               ],
               mainAxisAlignment: MainAxisAlignment.center,
             ),
-
             Spacer(flex: 2),
             Text.rich(
               TextSpan(
@@ -98,9 +141,10 @@ class LoginPage extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: '  Sign up',
-                    recognizer: TapGestureRecognizer()..onTap = () {
-                      NavigationService.toPage(context, AppPages.signUp);
-                    },
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        NavigationService.toPage(context, AppPages.signUp);
+                      },
                   )
                 ],
               ),

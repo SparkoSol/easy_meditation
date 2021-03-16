@@ -1,8 +1,10 @@
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/base/pages.dart';
 import 'package:easy_meditation/src/service/ui/notifications_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'base/theme.dart';
 import 'base/config.dart';
@@ -17,9 +19,11 @@ class App extends StatefulWidget {
   /// calling [runApp].
   static Future<void> initializeAndRun() async {
     WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
 
     await AppData.initiate();
     await NotificationsService.initialize();
+    SharedPreferences.setMockInitialValues({});
 
     return runApp(const App._());
   }

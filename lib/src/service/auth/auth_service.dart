@@ -23,6 +23,7 @@ class SocialLoginService {
       case FacebookLoginStatus.cancelledByUser:
         break;
       case FacebookLoginStatus.error:
+        print(authResult.errorMessage);
         onComplete(null);
         throw (authResult.errorMessage);
     }

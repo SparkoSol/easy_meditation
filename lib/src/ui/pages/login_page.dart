@@ -71,10 +71,8 @@ class LoginPage extends StatelessWidget {
                   onTap: () async {
                     await SocialLoginService.facebookAuth((result) {
                       print('RRRRRRRRRRRRRRRRRRRRr');
-                      print('RRRRRRRRRRRRRRRRRRRRr');
                       print(result.uid);
                       print(result.email);
-                      print('RRRRRRRRRRRRRRRRRRRRr');
                       print('RRRRRRRRRRRRRRRRRRRRr');
                     });
                   },
@@ -95,10 +93,8 @@ class LoginPage extends StatelessWidget {
                   onTap: () async {
                     await SocialLoginService.googleAuth((result) {
                       print('RRRRRRRRRRRRRRRRRRRRr');
-                      print('RRRRRRRRRRRRRRRRRRRRr');
                       print(result.uid);
                       print(result.email);
-                      print('RRRRRRRRRRRRRRRRRRRRr');
                       print('RRRRRRRRRRRRRRRRRRRRr');
                     });
                   },

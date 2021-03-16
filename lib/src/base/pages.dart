@@ -16,7 +16,7 @@ class AppPage {
 ///
 abstract class AppPages {
   static final routes = <String, WidgetBuilder>{
-    home.route: (context) => HomePage(),
+    home.route: (context) => LoginPage(),
     about.route: (context) => AboutUsPage(),
     signIn.route: (context) => LoginPage(),
     signUp.route: (context) => RegisterPage(),

@@ -8,6 +8,9 @@ abstract class Assets {
   static const homeIcon = 'assets/icons/home.png';
   static const lotusIcon = 'assets/icons/lotus.png';
   static const profileIcon = 'assets/icons/profile.png';
+  static const googleIcon = 'assets/icons/google.png';
+  static const facebookIcon = 'assets/icons/facebook.png';
+  static const appleIcon = 'assets/icons/apple.png';
 
   static const bgImage = 'assets/images/bg.png';
 }

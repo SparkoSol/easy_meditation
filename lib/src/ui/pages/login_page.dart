@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:easy_meditation/src/base/assets.dart';
 import 'package:easy_meditation/src/base/data.dart';
@@ -145,11 +146,8 @@ class SignInPage extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () async {
-                      await SocialLoginService.facebookAuth((result) {
-                        print('RRRRRRRRRRRRRRRRRRRRr');
-                        print(result.uid);
-                        print(result.email);
-                        print('RRRRRRRRRRRRRRRRRRRRr');
+                      await SocialLoginService.facebookAuth((result) async {
+                        SocialLoginService.signInOrRegister(context, result);
                       });
                     },
                     child: Container(
@@ -168,10 +166,7 @@ class SignInPage extends StatelessWidget {
                   GestureDetector(
                     onTap: () async {
                       await SocialLoginService.googleAuth((result) {
-                        print('RRRRRRRRRRRRRRRRRRRRr');
-                        print(result.uid);
-                        print(result.email);
-                        print('RRRRRRRRRRRRRRRRRRRRr');
+                        SocialLoginService.signInOrRegister(context, result);
                       });
                     },
                     child: Container(
@@ -187,15 +182,16 @@ class SignInPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Container(
-                    width: 55,
-                    height: 55,
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      shape: BoxShape.circle,
+                  if (Platform.isIOS)
+                    Container(
+                      width: 55,
+                      height: 55,
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
+                      ),
                     ),
-                  ),
                 ],
                 mainAxisAlignment: MainAxisAlignment.center,
               ),

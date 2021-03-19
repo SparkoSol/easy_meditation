@@ -10,4 +10,7 @@ abstract class Assets {
   static const profileIcon = 'assets/icons/profile.png';
 
   static const bgImage = 'assets/images/bg.png';
+  static const englishImage = 'assets/images/English.png';
+  static const frenchImage = 'assets/images/French.png';
+  static const indiaImage = 'assets/images/India.png';
 }

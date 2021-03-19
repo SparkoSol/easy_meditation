@@ -1,22 +1,27 @@
+import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/models/module.dart';
-import 'package:easy_meditation/src/service/rest/modules_rest.dart';
+import 'package:easy_meditation/src/ui/pages/audio_player_page.dart';
 import 'package:easy_meditation/src/ui/views/colored_background.dart';
 import 'package:easy_meditation/src/ui/widgets/module.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CourseDetailPageController extends ChangeNotifier {
-  int _courseId;
+  CourseDetailPageController();
+  int _courseId = 0;
+
   int get courseId => _courseId;
+
   set courseId(int value) {
-    _courseId = value;
+    _courseId = value ?? 0;
     notifyListeners();
   }
 }
 
 class CourseDetailPage extends StatefulWidget {
   final CourseDetailPageController controller;
+
   CourseDetailPage(this.controller);
 
   @override
@@ -24,45 +29,73 @@ class CourseDetailPage extends StatefulWidget {
 }
 
 class _CourseDetailPageState extends State<CourseDetailPage> {
+  _rebuild() {
+    if (super.mounted) setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
 
-    widget.controller.addListener(() => setState(() {}));
+    AppData().saveProgress = widget.controller.courseId;
+    widget.controller.addListener(_rebuild);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.addListener(_rebuild);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    Color textColor;
+    Color headerColor;
+    Color button1Color;
+    Color button2Color;
+    Color button1TextColor;
+    if (widget.controller.courseId == 0) {
+      textColor = Colors.white;
+      headerColor = AppTheme.darkBlueColor;
+      button1Color = AppTheme.primaryColor;
+      button1TextColor = Colors.white;
+      button2Color = Colors.white;
+    } else if (widget.controller.courseId == 1) {
+      headerColor = Color(0xFFFFC97E);
+      button1Color = AppTheme.darkBlueColor;
+      button1TextColor = Colors.white;
+      button2Color = AppTheme.darkBlueColor;
+    } else {
+      textColor = Colors.white;
+      button1Color = Colors.white;
+      button2Color = Colors.white;
+      headerColor = Color(0xFF333242);
+      button1TextColor = Color(0xFF333242);
+    }
+
+    final data = AppData.modules(widget.controller.courseId);
+
     return Scaffold(
-      appBar: CupertinoNavigationBar(middle: Text(Module.courses[widget.controller.courseId])),
+      appBar: CupertinoNavigationBar(
+          middle: Text(Module.courses[widget.controller.courseId])),
       body: ColoredBackground(
-        child: FutureBuilder<List<Module>>(
-          future: ModulesRestAPI().getModules(widget.controller.courseId),
-          builder: (context, AsyncSnapshot<List<Module>> snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.none:
-                return Center(child: Text('No Connection'));
-                break;
-              case ConnectionState.waiting:
-                return Center(child: CircularProgressIndicator());
-                break;
-              case ConnectionState.active:
-                return Center(child: CircularProgressIndicator());
-                break;
-              case ConnectionState.done:
-                break;
-            }
-
-            if (snapshot.hasError) {
-              return Center(child: Text(snapshot.error.toString()));
-             }
-
-            return CustomScrollView(slivers: [
-              SliverToBoxAdapter(
-                child: Container(
-                  height: 190,
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
+        child: CustomScrollView(slivers: [
+          SliverToBoxAdapter(
+            child: Container(
+              height: 190,
+              padding: const EdgeInsets.all(20),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(
+                    left: -100,
+                    bottom: -100,
+                    child: Image.asset(
+                      'assets/images/curves.png',
+                      width: MediaQuery.of(context).size.width * 1.5,
+                    ),
+                  ),
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -70,22 +103,28 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: AppTheme.darkBlueColor,
+                          color: textColor,
                         ),
                       ),
+                      SizedBox(height: 5),
                       Text(
-                        '${snapshot.data.length} Modules',
+                        '${data.length} Modules',
                         style: TextStyle(color: Colors.grey.shade500),
                       ),
                       Spacer(),
                       Row(children: [
                         Expanded(
                           child: TextButton.icon(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) {
+                                return AudioPlayerPage(data[0], data);
+                              }));
+                            },
                             label: Text('Start'),
                             style: TextButton.styleFrom(
-                              primary: Colors.white,
-                              backgroundColor: AppTheme.darkBlueColor,
+                              primary: button1TextColor,
+                              backgroundColor: button1Color,
                             ),
                             icon: Icon(CupertinoIcons.play_arrow_solid),
                           ),
@@ -95,16 +134,18 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                           child: OutlinedButton.icon(
                             onPressed: () {},
                             label: Expanded(
-                                child: Text(
-                              '2 HOURS, 20 MIN',
-                              style: TextStyle(
-                                fontWeight: FontWeight.normal,
-                                fontSize: 10,
+                              child: Text(
+                                _toTime(data.fold(
+                                    0, (p, e) => (p + e.length).toInt())),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 10,
+                                ),
                               ),
-                            )),
+                            ),
                             style: OutlinedButton.styleFrom(
-                              primary: AppTheme.darkBlueColor,
-                              side: BorderSide(color: AppTheme.darkBlueColor),
+                              primary: button2Color,
+                              side: BorderSide(color: button2Color),
                             ),
                             icon: Icon(CupertinoIcons.time),
                           ),
@@ -112,64 +153,89 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                       ])
                     ],
                   ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryColor1,
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(40),
-                    ),
-                  ),
+                ],
+              ),
+              decoration: BoxDecoration(
+                color: headerColor,
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(20),
                 ),
               ),
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 15, 20, 10),
-                sliver: SliverToBoxAdapter(
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 15, 20, 10),
+            sliver: SliverToBoxAdapter(
+              child: Row(children: [
+                Expanded(
                   child: Row(children: [
-                    Expanded(
-                      child: Row(children: [
-                        Icon(
-                          Icons.favorite,
-                          color: Colors.red.shade300,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          child: Text('${snapshot.data.fold(0, (pv, e) => pv + e.favorites)} Favorites'),
-                        ),
-                      ]),
+                    Icon(
+                      Icons.favorite,
+                      color: Colors.red.shade300,
                     ),
-                    Expanded(
-                      child: Row(children: [
-                        Icon(
-                          Icons.headset,
-                          color: Colors.blue,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          child: Text('${snapshot.data.fold(0, (pv, e) => pv + e.listened)} Listened'),
-                        ),
-                      ]),
-                    )
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: Text(
+                          '${data.fold(0, (pv, e) => pv + e.favorites)} Favorites'),
+                    ),
                   ]),
                 ),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 15, 20, 10),
-                sliver: SliverToBoxAdapter(
-                    child: Text(
-                  'Meditations',
-                  style: AppTheme.sectionHeaderStyle,
-                )),
-              ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) => ModuleWidget(snapshot.data[index]),
-                  childCount: snapshot.data.length,
-                ),
-              ),
-              SliverToBoxAdapter(child: SizedBox(height: 100)),
-            ]);
-          },
-        ),
+                Expanded(
+                  child: Row(children: [
+                    Icon(
+                      Icons.headset,
+                      color: Colors.blue,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: Text(
+                          '${data.fold(0, (pv, e) => pv + e.listened)} Listened'),
+                    ),
+                  ]),
+                )
+              ]),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 15, 20, 10),
+            sliver: SliverToBoxAdapter(
+                child: Text(
+              'Meditations',
+              style: AppTheme.sectionHeaderStyle,
+            )),
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => ModuleWidget(
+                  data[index],
+                  () => setState(() {
+                        AppData().writeFile();
+                      })),
+              childCount: data.length,
+            ),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: 100)),
+        ]),
       ),
     );
+  }
+
+  String _toTime(int val) {
+    final value = Duration(seconds: val);
+
+    twoDigit(int value) {
+      if (value < 10) return '0$value';
+      return value;
+    }
+
+    final minutes = value.inMinutes.remainder(Duration.minutesPerHour);
+    final msString = '${twoDigit(minutes)} MINUTES';
+
+    final hours = value.inHours;
+    if (hours > 0) {
+      return '${twoDigit(hours)} HOURS, $msString'.replaceAll('MINUTES', 'MIN');
+    } else {
+      return msString;
+    }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:easy_meditation/src/base/assets.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -23,18 +24,21 @@ class _LanguageSelectionState extends State<LanguageSelection> {
             LanguageTile(
               name: 'English - USA',
               selected: lang == 'en',
+              image: Assets.englishImage,
               onPressed: () => setState(() => lang = 'en'),
             ),
             Divider(),
             LanguageTile(
               name: 'Hindi - India',
               selected: lang == 'in',
+              image: Assets.indiaImage,
               onPressed: () => setState(() => lang = 'in'),
             ),
             Divider(),
             LanguageTile(
               name: 'French - France',
               selected: lang == 'fr',
+              image: Assets.frenchImage,
               onPressed: () => setState(() => lang = 'fr'),
             ),
             Padding(
@@ -68,20 +72,32 @@ class _LanguageSelectionState extends State<LanguageSelection> {
 
 class LanguageTile extends StatelessWidget {
   final String name;
+  final String image;
   final bool selected;
   final VoidCallback onPressed;
 
-  LanguageTile({this.name, this.selected, this.onPressed});
+  LanguageTile({
+    this.name,
+    this.image,
+    this.selected,
+    this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onPressed,
       child: Row(children: [
-        Placeholder(fallbackHeight: 25, fallbackWidth: 45),
+        Image.asset(image, height: 25, width: 45, fit: BoxFit.cover),
+        // Placeholder(fallbackHeight: 25, fallbackWidth: 45),
         SizedBox(width: 10),
         Expanded(child: Text(name)),
-        if (selected) Icon(Icons.check_circle, size: 20, color: Colors.green.shade800,)
+        if (selected)
+          Icon(
+            Icons.check_circle,
+            size: 20,
+            color: Colors.green.shade800,
+          )
       ]),
     );
   }

@@ -1,6 +1,12 @@
 import 'package:easy_meditation/src/base/theme.dart';
+import 'package:easy_meditation/src/service/payment-service.dart';
+import 'package:easy_meditation/src/ui/widgets/date-picker.dart';
+import 'package:easy_meditation/src/utils/input_validators.dart';
+import 'package:easy_meditation/src/utils/lazy_task.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+import 'package:stripe_payment/stripe_payment.dart';
 
 class CardDetailsView extends StatefulWidget {
   final VoidCallback onNext;
@@ -12,11 +18,17 @@ class CardDetailsView extends StatefulWidget {
 }
 
 class _CardDetailsViewState extends State<CardDetailsView> {
+  CreditCard card = CreditCard();
+  var formKey = GlobalKey<FormState>();
+  var mode = AutovalidateMode.disabled;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Form(
+        key: formKey,
+        autovalidateMode: mode,
         child: Column(children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 15),
@@ -41,6 +53,9 @@ class _CardDetailsViewState extends State<CardDetailsView> {
           ),
 
           TextFormField(
+            initialValue: card.name,
+            onSaved: (value)=> card.name = value,
+            validator: InputValidators.required,
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
               labelText: 'Full Name',
@@ -49,6 +64,11 @@ class _CardDetailsViewState extends State<CardDetailsView> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 25),
             child: TextFormField(
+              onSaved: (value)=> card.number = value,
+              initialValue: card.number,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              validator: InputValidators.required,
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.credit_card_outlined),
                 contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
@@ -56,22 +76,35 @@ class _CardDetailsViewState extends State<CardDetailsView> {
               ),
             ),
           ),
+          //Todo
           Row(children: [
             Expanded(
-              child: TextFormField(
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.calendar_today_rounded),
-                  contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-                  labelText: 'Expiry Date',
-                ),
+              child: DatePickerFormField(
+                onChanged: (DateTime value){
+                  card.expMonth = value.month;
+                  card.expYear = value.year;
+                },
               ),
             ),
+            // Expanded(
+            //   child: TextFormField(
+            //     // onSaved: (value)=> card.expMonth = value,
+            //     decoration: InputDecoration(
+            //       prefixIcon: Icon(Icons.calendar_today_rounded),
+            //       contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+            //       labelText: 'Expiry Date',
+            //     ),
+            //   ),
+            // ),
             SizedBox(width: 15),
             Expanded(
               child: TextFormField(
+                validator: InputValidators.required,
+                initialValue: card.cvc,
+                onSaved: (value)=> card.cvc = value,
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-                  labelText: 'CVV',
+                  labelText: 'CVC',
                 ),
               ),
             ),
@@ -79,7 +112,26 @@ class _CardDetailsViewState extends State<CardDetailsView> {
           Padding(
             padding: const EdgeInsets.only(top: 50, bottom: 10),
             child: TextButton(
-              onPressed: widget.onNext,
+              onPressed: () async{
+                if(formKey.currentState.validate()){
+                  formKey.currentState.save();
+                  await performLazyTask(context, () async {
+                    StripeTransactionResponse response = await StripeService.payViaExistingCard(
+                        card: card, amount: '3'
+                    );
+
+                    if (response.success ?? false) {
+                      print("Payment Successful");
+                      widget.onNext();
+                      return;
+                    }
+                  },message: 'Processing your transaction');
+                } else {
+                  setState(() {
+                    mode = AutovalidateMode.always;
+                  });
+                }
+              },
               child: Text('PAY', style: TextStyle(fontSize: 18)),
               style: TextButton.styleFrom(
                 primary: Colors.white,
@@ -93,7 +145,8 @@ class _CardDetailsViewState extends State<CardDetailsView> {
           Padding(
             padding: const EdgeInsets.only(top: 10, bottom: 20),
             child: OutlinedButton(
-              onPressed: widget.onNext,
+              onPressed: () async {
+              },
               child: Text('PAY WITH PAYPAL', style: TextStyle(fontSize: 18)),
               style: OutlinedButton.styleFrom(
                 primary: AppTheme.primaryColor,

@@ -12,7 +12,14 @@ class PageIndicator extends StatefulWidget {
 }
 
 class _PageIndicatorState extends State<PageIndicator> {
-  void _rebuild() => setState(() {});
+  var currentPage = 0;
+
+  void _rebuild() {
+    currentPage = widget.controller.page.toInt();
+
+    if (currentPage.toDouble() == widget.controller.page)
+      setState(() {});
+  }
 
   @override
   void initState() {
@@ -25,7 +32,7 @@ class _PageIndicatorState extends State<PageIndicator> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(widget.pages, (index) {
-        final selected = index == widget.controller.page?.round();
+        final selected = index == currentPage;
 
         return Container(
           height: 5,

@@ -1,3 +1,4 @@
+import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/ui/pages/course_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -41,14 +42,13 @@ class HomeView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Welcome, Kristin',
+                        'Welcome, ${AppData.user.name}',
                         style: const TextStyle(
                           fontSize: 22,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      // SizedBox(height: 2),
                       Text(
                         'Live happier with us',
                         style: const TextStyle(color: Colors.white),
@@ -81,20 +81,24 @@ class HomeView extends StatelessWidget {
                   ),
                   Row(children: [
                     Expanded(
-                        child: ModuleCard(
-                            index: 0,
-                            onPressed: () {
-                              _pC.jumpToPage(1);
-                              _cC.courseId = 0;
-                            })),
+                      child: ModuleCard(
+                        index: 0,
+                        onPressed: () {
+                          _pC.jumpToPage(1);
+                          _cC.courseId = 0;
+                        },
+                      ),
+                    ),
                     SizedBox(width: 20),
                     Expanded(
-                        child: ModuleCard(
-                            index: 1,
-                            onPressed: () {
-                              _pC.jumpToPage(1);
-                              _cC.courseId = 1;
-                            })),
+                      child: ModuleCard(
+                        index: 1,
+                        onPressed: () {
+                          _pC.jumpToPage(1);
+                          _cC.courseId = 1;
+                        },
+                      ),
+                    ),
                   ]),
                   ModuleCard(
                     index: 2,
@@ -103,71 +107,39 @@ class HomeView extends StatelessWidget {
                       _cC.courseId = 2;
                     },
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, bottom: 15),
-                    child: Text(
-                      'Recommended for you',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                    ),
-                  ),
-                  Column(children: [
-                    Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4)),
-                      child: ListTile(
-                        leading: Container(
-                          width: 47,
-                          height: 47,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: AppTheme.primaryColor),
-                          ),
-                          child: Icon(Icons.play_arrow,
-                              color: AppTheme.primaryColor),
-                        ),
-                        title: Text('Module 1'),
-                        subtitle: Text('Advanced Course'),
-                        trailing: Text('10 min'),
+                  if (AppData.recommended.isNotEmpty) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, bottom: 15),
+                      child: Text(
+                        'Recommended for you',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
                       ),
                     ),
-                    Container(
-                      height: 1,
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white,
-                            Colors.grey.shade600,
-                            Colors.white
-                          ],
-                        ),
-                      ),
-                    ),
-                  ]),
-                  Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(4)),
-                    child: Column(children: [
-                      ListTile(
-                        leading: Container(
-                          width: 47,
-                          height: 47,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: AppTheme.primaryColor),
+                    Column(children: [
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4)),
+                        child: ListTile(
+                          leading: Container(
+                            width: 47,
+                            height: 47,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: AppTheme.primaryColor),
+                            ),
+                            child: Icon(Icons.play_arrow,
+                                color: AppTheme.primaryColor),
                           ),
-                          child: Icon(Icons.play_arrow,
-                              color: AppTheme.primaryColor),
+                          title: Text('Module 1'),
+                          subtitle: Text('Advanced Course'),
+                          trailing: Text('10 min'),
                         ),
-                        title: Text('Module 1'),
-                        subtitle: Text('Advanced Course'),
-                        trailing: Text('10 min'),
                       ),
                       Container(
                         height: 1,
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
@@ -179,7 +151,41 @@ class HomeView extends StatelessWidget {
                         ),
                       ),
                     ]),
-                  ),
+                    Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4)),
+                      child: Column(children: [
+                        ListTile(
+                          leading: Container(
+                            width: 47,
+                            height: 47,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: AppTheme.primaryColor),
+                            ),
+                            child: Icon(Icons.play_arrow,
+                                color: AppTheme.primaryColor),
+                          ),
+                          title: Text('Module 1'),
+                          subtitle: Text('Advanced Course'),
+                          trailing: Text('10 min'),
+                        ),
+                        Container(
+                          height: 1,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.white,
+                                Colors.grey.shade600,
+                                Colors.white
+                              ],
+                            ),
+                          ),
+                        ),
+                      ]),
+                    ),
+                  ]
                 ],
               ),
             ),

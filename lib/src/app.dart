@@ -1,5 +1,6 @@
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/base/pages.dart';
+import 'package:easy_meditation/src/service/ui/modal_services.dart';
 import 'package:easy_meditation/src/service/ui/notifications_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -17,10 +18,6 @@ class App extends StatefulWidget {
   /// calling [runApp].
   static Future<void> initializeAndRun() async {
     WidgetsFlutterBinding.ensureInitialized();
-
-    await AppData.initiate();
-    await NotificationsService.initialize();
-
     return runApp(const App._());
   }
 
@@ -47,7 +44,9 @@ class _AppState extends State<App> {
       routes: AppPages.routes,
       darkTheme: AppTheme.dark,
       themeMode: config.themeMode,
+      initialRoute: AppPages.splash.route,
       supportedLocales: AppLocalizations.supportedLocales,
+      scaffoldMessengerKey: ModalService.scaffoldMessengerKey,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
     );
   }

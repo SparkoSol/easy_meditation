@@ -1,3 +1,5 @@
+import 'package:easy_meditation/src/base/data.dart';
+import 'package:easy_meditation/src/service/ui/notifications_service.dart';
 import 'package:easy_meditation/src/ui/modals/notifications_management.dart';
 import 'package:flutter/material.dart';
 
@@ -38,21 +40,35 @@ class _SplashScreenState extends State<SplashScreen>
       curve: Interval(0.6, 1, curve: Curves.ease),
     ));
 
-    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-    //   controller.addStatusListener((status) async {
-    //     if (status == AnimationStatus.completed) {
-    //       await Future.delayed(Duration(milliseconds: 500), () {});
-    //       Navigator.of(context).pushReplacementNamed('/welcome');
-    //     }
-    //   });
-    //
-    //   controller.forward();
-    // });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      controller.addStatusListener((status) async {
+        if (status == AnimationStatus.completed) {
+          await AppData.initiate();
+          await NotificationsService.initialize();
+
+          /// TODO: Precache data.
+
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil('/welcome', (_) => false);
+          // if (AppData().isFirst) {
+          //
+          // } else {
+          //   if (AppData.user != null) {
+          //     Navigator.of(context).pushNamedAndRemoveUntil('/', (_) => false);
+          //   } else {
+          //     Navigator.of(context)
+          //         .pushNamedAndRemoveUntil('/sign-in', (_) => false);
+          //   }
+          // }
+        }
+      });
+
+      controller.forward();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ReminderManagementPage();
     return Material(
       color: Colors.white,
       child: AnimatedBuilder(

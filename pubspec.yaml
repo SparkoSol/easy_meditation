@@ -34,6 +34,9 @@ dependencies:
   pretty_dio_logger:
   flutter_local_notifications: 5.0.0-nullsafety.1
   adobe_xd:
+  http:
+  shimmer: ^1.1.2
+  stripe_payment:
 
 
   # The following adds the Cupertino Icons font to your application.

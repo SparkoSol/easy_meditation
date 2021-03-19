@@ -1,8 +1,11 @@
+import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/base/pages.dart';
 import 'package:easy_meditation/src/base/theme.dart';
+import 'package:easy_meditation/src/service/ui/lazy_task_service.dart';
 import 'package:easy_meditation/src/service/ui/navigation_service.dart';
 import 'package:easy_meditation/src/ui/modals/language_selection.dart';
 import 'package:easy_meditation/src/ui/modals/payment_bottom_sheet.dart';
+import 'package:easy_meditation/src/ui/pages/account_settings_page.dart';
 import 'package:easy_meditation/src/ui/views/colored_background.dart';
 import 'package:easy_meditation/src/ui/widgets/preference_tile.dart';
 import 'package:flutter/cupertino.dart';
@@ -36,7 +39,7 @@ class _PreferencesViewState extends State<PreferencesView> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
                   child: Row(children: [
-                    Text('Username'),
+                    Text(AppData.user.name ?? 'Not Signed in'),
                     Spacer(),
                     CircleAvatar(
                       backgroundColor: Colors.white,
@@ -61,22 +64,23 @@ class _PreferencesViewState extends State<PreferencesView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Premium Access',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF00AC06),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        '27 days left',
-                        style: TextStyle(color: Colors.grey.shade600),
-                      ),
+                      // Text(
+                      //   'Premium Access',
+                      //   style: TextStyle(
+                      //     fontSize: 16,
+                      //     color: Color(0xFF00AC06),
+                      //     fontWeight: FontWeight.bold,
+                      //   ),
+                      // ),
+                      // SizedBox(height: 10),
+                      // Text(
+                      //   '27 days left',
+                      //   style: TextStyle(color: Colors.grey.shade600),
+                      // ),
                       Spacer(),
                       TextButton(
                         onPressed: () {
+                          print("called");
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
@@ -114,7 +118,11 @@ class _PreferencesViewState extends State<PreferencesView> {
                   padding: const EdgeInsets.only(bottom: 10, top: 30),
                   child: Text('Other', style: AppTheme.sectionHeaderStyle),
                 ),
-                PreferenceTile(title: 'Account Settings', onPressed: () {}),
+                PreferenceTile(title: 'Account Settings', onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                    return AccountSettingsPage();
+                  }));
+                }),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: PreferenceTile(
@@ -152,60 +160,71 @@ class _PreferencesViewState extends State<PreferencesView> {
                     ),
                     onPressed: () {
                       showDialog(
-                          context: context,
-                          builder: (context) {
-                            return Dialog(
-                              insetPadding: const EdgeInsets.all(20),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(15, 20, 15, 10),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text('Confirmation',
-                                        style: AppTheme.sectionHeaderStyle),
-                                    SizedBox(height: 20),
-                                    Text(
-                                      'Are you sure you want to logout?',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: AppTheme.darkBlueColor,
-                                      ),
+                        context: context,
+                        builder: (context) {
+                          return Dialog(
+                            insetPadding: const EdgeInsets.all(20),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.fromLTRB(15, 20, 15, 10),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('Confirmation',
+                                      style: AppTheme.sectionHeaderStyle),
+                                  SizedBox(height: 20),
+                                  Text(
+                                    'Are you sure you want to logout?',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: AppTheme.darkBlueColor,
                                     ),
-                                    SizedBox(height: 20),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 20),
-                                      child: Row(children: [
-                                        GestureDetector(
-                                          child: Text(
-                                            'Continue Meditation',
-                                            style: TextStyle(
-                                              color: AppTheme.darkBlueColor,
-                                            ),
-                                          ),
-                                          onTap: Navigator.of(context).pop,
-                                        ),
-                                        Spacer(),
-                                        TextButton(
-                                          onPressed: Navigator.of(context).pop,
-                                          child: Text('Logout'),
-                                          style: TextButton.styleFrom(
-                                            primary: Colors.white,
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 30,
-                                              vertical: 13,
-                                            ),
-                                            backgroundColor:
-                                                AppTheme.darkBlueColor,
+                                  ),
+                                  SizedBox(height: 20),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    child: Row(children: [
+                                      GestureDetector(
+                                        child: Text(
+                                          'Continue Meditation',
+                                          style: TextStyle(
+                                            color: AppTheme.darkBlueColor,
                                           ),
                                         ),
-                                      ]),
-                                    )
-                                  ],
-                                ),
+                                        onTap: Navigator.of(context).pop,
+                                      ),
+                                      Spacer(),
+                                      TextButton(
+                                        onPressed: () async {
+                                          await LazyTaskService.execute(
+                                            context,
+                                            () async {
+                                              await AppData().deleteUser();
+                                              AppData().accessToken = null;
+                                            },
+                                          );
+
+                                          Navigator.of(context).pushNamedAndRemoveUntil('/sign-in', (route) => false);
+                                        },
+                                        child: Text('Logout'),
+                                        style: TextButton.styleFrom(
+                                          primary: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 30,
+                                            vertical: 13,
+                                          ),
+                                          backgroundColor:
+                                              AppTheme.darkBlueColor,
+                                        ),
+                                      ),
+                                    ]),
+                                  )
+                                ],
                               ),
-                            );
-                          });
+                            ),
+                          );
+                        },
+                      );
                     },
                   ),
                 ),

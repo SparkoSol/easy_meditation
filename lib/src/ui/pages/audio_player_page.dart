@@ -1,5 +1,10 @@
+import 'dart:async';
+
+import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/models/module.dart';
 import 'package:easy_meditation/src/service/rest/_client.dart';
+import 'package:easy_meditation/src/service/ui/lazy_task_service.dart';
+import 'package:easy_meditation/src/ui/widgets/module.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:easy_meditation/src/base/theme.dart';
@@ -8,38 +13,33 @@ import 'package:just_audio/just_audio.dart';
 
 class AudioPlayerPage extends StatefulWidget {
   final Module module;
+  final List<Module> otherModules;
 
-  AudioPlayerPage(this.module);
+  AudioPlayerPage(this.module, [this.otherModules = const []]);
 
   @override
   _AudioPlayerPageState createState() => _AudioPlayerPageState();
 }
 
 class _AudioPlayerPageState extends State<AudioPlayerPage> {
-  var isLoading = true;
-  final player = AudioPlayer();
+  PlaylistController controller;
+
+  _rebuild() => setState(() {});
 
   @override
   void initState() {
     super.initState();
-
-    final url =
-        dioClient.options.baseUrl + '/courses/modules/' + widget.module.id;
-
-    /// Player configurations;
-    player.setAudioSource(
-      LockCachingAudioSource(Uri.parse(url)),
-      preload: true,
-    );
-
-    player.setLoopMode(LoopMode.off);
+    controller = PlaylistController(
+      widget.otherModules.isNotEmpty ? widget.otherModules : [widget.module],
+      true,
+    )..addListener(_rebuild);
   }
+
+  Module get module => controller.module;
 
   @override
   Widget build(BuildContext context) {
-    player.durationStream.listen((value) {
-      setState(() => isLoading = false);
-    });
+    final isFav = AppData.favorites.contains(controller.module.id);
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -54,7 +54,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
         ),
         backgroundColor: Colors.transparent,
         padding: EdgeInsetsDirectional.zero,
-        middle: Text(Module.courses[widget.module.courseNumber]),
+        middle: Text(Module.courses[module.courseNumber]),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -62,65 +62,65 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
               width: 30,
               height: 30,
               child: TextButton(
-                onPressed: () {},
+                onPressed: () async {
+                  LazyTaskService.execute(context, () async {
+                    if (isFav) {
+                      module.favorites--;
+                      dioClient.delete(
+                          '/courses/modules/${module.id}/unmark-fav',
+                          data: {"userId": AppData.user.id});
+                      AppData.favorites.remove(module.id);
+                    } else {
+                      module.favorites++;
+                      dioClient.post('/courses/modules/${module.id}/mark-fav',
+                          data: {"userId": AppData.user.id});
+
+                      AppData.favorites.add(module.id);
+                    }
+
+                    setState(() {});
+                  });
+                },
                 style: TextButton.styleFrom(
                   primary: AppTheme.primaryColor,
                   padding: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50)),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
                 ),
                 child: Icon(
-                  Icons.favorite_outline,
+                  isFav ? Icons.favorite : Icons.favorite_outline,
                   size: 22,
-                  color: Colors.grey.shade800,
+                  color: isFav ? AppTheme.primaryColor : Colors.grey.shade800,
                 ),
               ),
             ),
-            SizedBox(
-              width: 30,
-              height: 30,
-              child: TextButton(
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(30),
+            if (widget.otherModules.isNotEmpty)
+              SizedBox(
+                width: 30,
+                height: 30,
+                child: TextButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(30),
+                        ),
                       ),
+                      builder: (context) => UpNextBottomSheet(controller),
+                    );
+                  },
+                  style: TextButton.styleFrom(
+                    primary: Colors.grey.shade800,
+                    padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
                     ),
-                    builder: (context) {
-                      return ListView(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              top: 20,
-                              left: 20,
-                              bottom: 10,
-                            ),
-                            child: Text(
-                              'Up next',
-                              style: AppTheme.sectionHeaderStyle,
-                            ),
-                          ),
-                          // ModuleWidget(),
-                          // ModuleWidget(),
-                          // ModuleWidget(),
-                          // ModuleWidget(),
-                          // ModuleWidget(),
-                        ],
-                      );
-                    },
-                  );
-                },
-                style: TextButton.styleFrom(
-                  primary: Colors.grey.shade800,
-                  padding: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50)),
+                  ),
+                  child: Icon(Icons.more_vert, size: 22),
                 ),
-                child: Icon(Icons.more_vert, size: 22),
               ),
-            ),
           ],
         ),
       ),
@@ -134,40 +134,52 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                 flex: 7,
                 child: Column(children: [
                   Text(
-                    widget.module.name,
+                    module.name,
                     style: AppTheme.sectionHeaderStyle,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 70),
                     child: Text(
-                      '${Module.courses[widget.module.courseNumber]} level',
+                      '${Module.courses[module.courseNumber]} level',
                     ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SeekControl(player),
-                      PlayPauseButton(player: player, loading: isLoading),
-                      SeekControl(player, true),
+                      SeekControl(controller._player),
+                      PlayPauseButton(player: controller),
+                      SeekControl(controller._player, true),
                     ],
                   ),
                   StreamBuilder<Duration>(
-                    stream: player.positionStream,
+                    stream: controller.progress,
                     builder: (context, snapshot) {
+                      var progress = 0.0;
+
+                      Duration timeLeft;
+                      Duration timeElapsed;
+                      if (snapshot.data != null &&
+                          !controller.loading &&
+                          controller.currentDuration != null) {
+                        progress = snapshot.data.inSeconds /
+                            controller.currentDuration.inSeconds;
+
+                        timeElapsed = snapshot.data;
+                        timeLeft = controller.currentDuration - timeElapsed;
+                      }
+
                       return Column(
                         children: [
                           Slider(
-                            value: !isLoading
-                                ? snapshot.data.inSeconds /
-                                    player.duration?.inSeconds
-                                : 0,
+                            value: progress,
                             activeColor: Color(0xFF252223),
                             inactiveColor: Color(0x11252223),
                             onChanged: (double value) {
-                              player.seek(player.duration * value);
+                              controller
+                                  .seekTo(controller.currentDuration * value);
                             },
                           ),
-                          if (isLoading)
+                          if (controller.loading)
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 30),
@@ -182,10 +194,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 30),
                               child: Row(children: [
-                                Text(_toTime(player.position)),
+                                Text(_toTime(timeElapsed)),
                                 Spacer(),
-                                Text('-' +
-                                    _toTime(player.duration - player.position)),
+                                Text('-' + _toTime(timeLeft)),
                               ]),
                             )
                         ],
@@ -202,7 +213,8 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
   }
 
   void dispose() {
-    player.dispose();
+    controller.removeListener(_rebuild);
+    controller.dispose();
     super.dispose();
   }
 
@@ -228,20 +240,35 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
 }
 
 class PlayPauseButton extends StatefulWidget {
-  final bool loading;
-  final AudioPlayer player;
+  final PlaylistController player;
 
-  PlayPauseButton({this.player, this.loading = false});
+  PlayPauseButton({this.player});
 
   @override
   _PlayPauseButtonState createState() => _PlayPauseButtonState();
 }
 
 class _PlayPauseButtonState extends State<PlayPauseButton> {
+  void _rebuild() => setState(() {});
+
+  @override
+  void initState() {
+    super.initState();
+    widget.player.addListener(_rebuild);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.player.removeListener(_rebuild);
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('Playing: ${widget.player.playing}');
+
     Widget child;
-    if (widget.loading) {
+    if (widget.player.loading) {
       child = CircularProgressIndicator(
         strokeWidth: 2,
         valueColor: AlwaysStoppedAnimation(Colors.white),
@@ -259,15 +286,13 @@ class _PlayPauseButtonState extends State<PlayPauseButton> {
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: TextButton(
         child: child,
-        onPressed: !widget.loading
+        onPressed: !widget.player.loading
             ? () {
                 if (widget.player.playing) {
                   widget.player.pause();
                 } else {
                   widget.player.play();
                 }
-
-                setState(() {});
               }
             : null,
         style: TextButton.styleFrom(
@@ -312,4 +337,208 @@ class SeekControl extends TextButton {
             )
           ]),
         );
+}
+
+class PlaylistController extends ChangeNotifier {
+  final List<Module> _songs;
+  final _player = AudioPlayer();
+
+  PlaylistController(this._songs, [this.autoplay = false]) {
+    _loadModule(_songs[_index]);
+  }
+
+  Module _module;
+  var _index = 0;
+  var _repeat = false;
+  var _loading = false;
+  var _playing = false;
+
+  var autoplay = false;
+  StreamSubscription _streamSub;
+
+  void _loadModule(Module module) async {
+    _module = module;
+    _loading = true;
+    _playing = false;
+    notifyListeners();
+
+    final url = dioClient.options.baseUrl + '/courses/modules/' + module.id;
+
+    _player.setAudioSource(
+      LockCachingAudioSource(Uri.parse(url)),
+      preload: true,
+    );
+    _player.seek(Duration(seconds: 0));
+
+    await _player.durationStream.first;
+    _loading = false;
+
+    if (autoplay) {
+      play();
+    } else {
+      notifyListeners();
+    }
+
+    _player.processingStateStream.listen((event) {
+      if (event == ProcessingState.completed) {
+        playNext();
+      }
+    });
+
+    print('Stream sub: ' + _streamSub.toString());
+  }
+
+  void play() async {
+    if (!_loading) {
+      _player.play();
+      _playing = true;
+
+      notifyListeners();
+    }
+  }
+
+  void pause() async {
+    if (!_loading) {
+      _player.pause();
+      _playing = false;
+
+      notifyListeners();
+    }
+  }
+
+  Duration get currentDuration => _player.duration;
+
+  Stream<Duration> get progress => _player.positionStream;
+
+  bool get repeat => _repeat;
+
+  bool get loading => _loading;
+
+  bool get playing => _playing;
+
+  Module get module => _module;
+
+  List<Module> get modules => _songs;
+
+  set repeat(bool value) {
+    _repeat = value;
+    notifyListeners();
+  }
+
+  int get index => _index;
+
+  playSpecific(int index) {
+    if (index > -1 && index < _songs.length)
+      _loadModule(_songs[_index = index]);
+  }
+
+  playPrev() {
+    if (_index > 0) _loadModule(_songs[--_index]);
+  }
+
+  playNext() async {
+    if (_index < _songs.length - 1)
+      _loadModule(_songs[++_index]);
+    else if (_repeat) {
+      _player.setLoopMode(LoopMode.all);
+    }
+  }
+
+  seekTo(Duration duration) {
+    if (_playing) {
+      _player.seek(duration);
+    }
+  }
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+}
+
+class UpNextBottomSheet extends StatefulWidget {
+  final PlaylistController controller;
+
+  UpNextBottomSheet(this.controller);
+
+  @override
+  _UpNextBottomSheetState createState() => _UpNextBottomSheetState();
+}
+
+class _UpNextBottomSheetState extends State<UpNextBottomSheet> {
+  _rebuild() => setState(() {});
+
+  @override
+  void initState() {
+    widget.controller.addListener(_rebuild);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text('Up next', style: AppTheme.sectionHeaderStyle),
+              ),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  primary: widget.controller.repeat
+                      ? Colors.white
+                      : AppTheme.primaryColor,
+                  backgroundColor: widget.controller.repeat
+                      ? AppTheme.primaryColor
+                      : Colors.white,
+                  side: BorderSide(color: AppTheme.primaryColor),
+                ),
+                onPressed: () {
+                  widget.controller.repeat = !widget.controller.repeat;
+                },
+                icon: Text('Loop'),
+                label: Icon(CupertinoIcons.repeat),
+              ),
+            ],
+          ),
+        ),
+        ...(() sync* {
+          for (var i = 0; i < widget.controller.modules.length; ++i) {
+            final pressed = () {
+              if (widget.controller.index == i) return;
+              widget.controller.playSpecific(i);
+            };
+
+            if (i < widget.controller.index) {
+              yield Opacity(
+                opacity: .5,
+                child: ModuleWidget(
+                  widget.controller.modules[i],
+                  pressed,
+                  i == widget.controller.index,
+                  false,
+                ),
+              );
+            } else {
+              yield ModuleWidget(
+                widget.controller.modules[i],
+                pressed,
+                i == widget.controller.index,
+                false,
+              );
+            }
+          }
+        })()
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_rebuild);
+    super.dispose();
+  }
 }

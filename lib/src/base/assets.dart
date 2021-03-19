@@ -5,6 +5,10 @@
 /// also simplifies the process of renaming, removing assets, i.e. instead of
 /// changing the path at every occurrence, we can just change it at one place.
 abstract class Assets {
+  static const appleIcon = 'assets/icons/apple.png';
+  static const googleIcon = 'assets/icons/google.png';
+  static const facebookIcon = 'assets/icons/facebook.png';
+
   static const homeIcon = 'assets/icons/home.png';
   static const lotusIcon = 'assets/icons/lotus.png';
   static const profileIcon = 'assets/icons/profile.png';

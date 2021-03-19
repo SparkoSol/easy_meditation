@@ -109,7 +109,7 @@ class StripeService {
         'payment_method_types[]': 'card'
       };
       var response = await http.post(
-          StripeService.paymentApiUrl,
+          Uri.parse(StripeService.paymentApiUrl),
           body: body,
           headers: StripeService.headers
       );

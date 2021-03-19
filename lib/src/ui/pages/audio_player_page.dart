@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:http/http.dart' as http;
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/models/module.dart';
 import 'package:easy_meditation/src/service/rest/_client.dart';
@@ -66,14 +68,16 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                   LazyTaskService.execute(context, () async {
                     if (isFav) {
                       module.favorites--;
-                      dioClient.delete(
-                          '/courses/modules/${module.id}/unmark-fav',
-                          data: {"userId": AppData.user.id});
+                      http.delete(
+                          Uri.parse('/courses/modules/${module.id}/unmark-fav'),
+                          body: jsonEncode({"userId": AppData.user.id}));
                       AppData.favorites.remove(module.id);
                     } else {
                       module.favorites++;
-                      dioClient.post('/courses/modules/${module.id}/mark-fav',
-                          data: {"userId": AppData.user.id});
+                      http.post(
+                        Uri.parse('/courses/modules/${module.id}/mark-fav'),
+                        body: jsonEncode({"userId": AppData.user.id}),
+                      );
 
                       AppData.favorites.add(module.id);
                     }
@@ -362,7 +366,7 @@ class PlaylistController extends ChangeNotifier {
     _playing = false;
     notifyListeners();
 
-    final url = dioClient.options.baseUrl + '/courses/modules/' + module.id;
+    final url = '$apiUrl/courses/modules/' + module.id;
 
     _player.setAudioSource(
       LockCachingAudioSource(Uri.parse(url)),

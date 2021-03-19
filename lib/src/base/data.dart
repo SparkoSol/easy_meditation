@@ -101,22 +101,22 @@ class AppData {
 
     if (data.containsKey('beginner')) {
       beginner = (data['beginner'] as List)
-              ?.map((e) => Module.fromJson(e))
-              ?.toList() ??
+          ?.map((e) => Module.fromJson(e))
+          ?.toList() ??
           [];
     }
 
     if (data.containsKey('advanced')) {
       advanced = (data['advanced'] as List)
-              ?.map((e) => Module.fromJson(e))
-              ?.toList() ??
+          ?.map((e) => Module.fromJson(e))
+          ?.toList() ??
           [];
     }
 
     if (data.containsKey('intermediate')) {
       intermediate = (data['intermediate'] as List)
-              ?.map((e) => Module.fromJson(e))
-              ?.toList() ??
+          ?.map((e) => Module.fromJson(e))
+          ?.toList() ??
           [];
     }
   }
@@ -148,14 +148,14 @@ class AppData {
   }
 
   List<bool> get reminderDays => [
-        _preferences.getBool('m') ?? false,
-        _preferences.getBool('t') ?? false,
-        _preferences.getBool('w') ?? false,
-        _preferences.getBool('th') ?? false,
-        _preferences.getBool('f') ?? false,
-        _preferences.getBool('s') ?? false,
-        _preferences.getBool('su') ?? false,
-      ];
+    _preferences.getBool('m') ?? false,
+    _preferences.getBool('t') ?? false,
+    _preferences.getBool('w') ?? false,
+    _preferences.getBool('th') ?? false,
+    _preferences.getBool('f') ?? false,
+    _preferences.getBool('s') ?? false,
+    _preferences.getBool('su') ?? false,
+  ];
 
   set reminderDays(List<bool> values) {
     _preferences.setBool('m', values[0]);
@@ -175,3 +175,4 @@ class AppData {
     _preferences.setInt('lastTimeProgress', progress);
   }
 }
+

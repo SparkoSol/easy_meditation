@@ -1,4 +1,5 @@
-import 'package:dio/dio.dart';
+import 'dart:convert';
+
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/models/register_request.dart';
 import 'package:easy_meditation/src/service/rest/_client.dart';
@@ -9,6 +10,7 @@ import 'package:easy_meditation/src/ui/widgets/text_field.dart';
 import 'package:easy_meditation/src/utils/input_validators.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -87,9 +89,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     var flag = false;
                     LazyTaskService.execute(context, () async {
                       try {
-                        final response =
-                            await dioClient.post('/users', data: user.toJson());
-                      } on DioError catch (e) {
+                        final response = await http.post(
+                          Uri.parse('$apiUrl/users'),
+                          body: jsonEncode(user.toJson()),
+                        );
+                      } catch (e) {
                         if (e.response.statusCode == 400) {
                           ModalService.scaffoldMessengerKey.currentState
                               .showSnackBar(SnackBar(

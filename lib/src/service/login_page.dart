@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/base/pages.dart';
 import 'package:easy_meditation/src/base/theme.dart';
@@ -12,6 +14,7 @@ import 'package:easy_meditation/src/ui/widgets/text_field.dart';
 import 'package:easy_meditation/src/utils/input_validators.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class SignInPage extends StatelessWidget {
   final formKey = GlobalKey<FormState>();
@@ -64,9 +67,9 @@ class SignInPage extends StatelessWidget {
                     formKey.currentState.save();
 
                     await LazyTaskService.execute(context, () async {
-                      var response = await dioClient.post(
-                        '/auth/sign-in',
-                        data: request.toJson(),
+                      var response = await http.post(
+                        Uri.parse('$apiUrl/auth/sign-in'),
+                        body: jsonEncode(request.toJson()),
                       );
                       if (response.statusCode == 401) {
                         print('here');
@@ -88,13 +91,16 @@ class SignInPage extends StatelessWidget {
                         );
                         return;
                       }
-                      AppData().accessToken = response.data['access_token'];
 
-                      response = await dioClient.get('/auth/profile');
-                      if (response.data.containsKey('user'))
-                        AppData().saveUser(User.fromJson(response.data['user']));
-                      if (response.data.containsKey('favorites'))
-                        AppData.favorites.addAll(response.data['favorites']);
+                      var data = jsonDecode(response.body)['access_token'];
+                      AppData().accessToken = data;
+
+                      response = await http.get(Uri.parse('$apiUrl/auth/profile'));
+                      data = jsonDecode(response.body);
+                      if (data.containsKey('user'))
+                        AppData().saveUser(User.fromJson(data['user']));
+                      if (data.containsKey('favorites'))
+                        AppData.favorites.addAll(data['favorites']);
                     });
 
                     if (AppData.user != null) {

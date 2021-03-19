@@ -1,8 +1,10 @@
+import 'package:easy_meditation/src/base/assets.dart';
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/base/pages.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/models/register_request.dart';
 import 'package:easy_meditation/src/models/sign_in_request.dart';
+import 'package:easy_meditation/src/service/auth_service.dart';
 import 'package:easy_meditation/src/service/rest/_client.dart';
 import 'package:easy_meditation/src/service/ui/lazy_task_service.dart';
 import 'package:easy_meditation/src/service/ui/modal_services.dart';
@@ -135,22 +137,48 @@ class SignInPage extends StatelessWidget {
               ),
               Row(
                 children: [
-                  Container(
-                    width: 55,
-                    height: 55,
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: Color(0xFF7583CA),
-                      shape: BoxShape.circle,
+                  GestureDetector(
+                    onTap: () async {
+                      await SocialLoginService.facebookAuth((result) {
+                        print('RRRRRRRRRRRRRRRRRRRRr');
+                        print(result.uid);
+                        print(result.email);
+                        print('RRRRRRRRRRRRRRRRRRRRr');
+                      });
+                    },
+                    child: Container(
+                      width: 55,
+                      height: 55,
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF7583CA),
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: AssetImage(Assets.facebookIcon),
+                        ),
+                      ),
                     ),
                   ),
-                  Container(
-                    width: 55,
-                    height: 55,
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
+                  GestureDetector(
+                    onTap: () async {
+                      await SocialLoginService.googleAuth((result) {
+                        print('RRRRRRRRRRRRRRRRRRRRr');
+                        print(result.uid);
+                        print(result.email);
+                        print('RRRRRRRRRRRRRRRRRRRRr');
+                      });
+                    },
+                    child: Container(
+                      width: 55,
+                      height: 55,
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: AssetImage(Assets.googleIcon),
+                        ),
+                      ),
                     ),
                   ),
                   Container(

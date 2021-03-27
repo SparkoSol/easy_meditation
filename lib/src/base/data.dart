@@ -2,18 +2,22 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:easy_meditation/src/models/module.dart';
+import 'package:easy_meditation/src/models/card.dart' as c;
 import 'package:easy_meditation/src/models/register_request.dart';
+import 'package:easy_meditation/src/models/transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppData {
   static User user;
+  static c.Card _card;
   static List<String> favorites = [];
   static List<Module> recommended = [];
   static List<String> recommendations;
   static SharedPreferences _preferences;
   static String _filePath;
+  static Transaction _transaction;
 
   static List<Module> beginner = [];
   static List<Module> advanced = [];
@@ -25,14 +29,16 @@ class AppData {
     if (index == 2) return advanced;
   }
 
-  void writeFile() {
-    print(user.name);
-    File(_filePath).writeAsString(jsonEncode({
-      'user': user?.toJson(),
+  Future writeFile() async {
+    print(_filePath);
+    await File(_filePath).writeAsString(jsonEncode({
+      'user': user?.toJson() ?? null,
       'favorites': favorites,
       'recommended': recommended.map((e) => e.toJson()).toList(),
       'beginner': beginner,
       'advanced': advanced,
+      'card': _card,
+      'transaction': _transaction,
       'intermediate': intermediate,
     }));
   }
@@ -51,7 +57,8 @@ class AppData {
 
   Future deleteUser() async {
     AppData.user = null;
-    writeFile();
+    _lastTimeProgress = 0;
+    await writeFile();
   }
 
   void addFavorites(String value) {
@@ -89,7 +96,6 @@ class AppData {
     }
 
     final chunk = await file.readAsString();
-    print(chunk);
     final data = jsonDecode(chunk == '' ? '{}' : chunk) as Map;
     if (data.containsKey('user') && data['user'] != null) {
       user = User.fromJson(data['user']);
@@ -118,6 +124,10 @@ class AppData {
           ?.map((e) => Module.fromJson(e))
           ?.toList() ??
           [];
+    }
+
+    if (data.containsKey('transaction')) {
+      _transaction = Transaction.fromJson(data['transaction']);
     }
   }
 
@@ -165,6 +175,18 @@ class AppData {
     _preferences.setBool('f', values[4]);
     _preferences.setBool('s', values[5]);
     _preferences.setBool('su', values[6]);
+  }
+
+  c.Card get card => _card;
+  set card(c.Card card) {
+    _card = card;
+    writeFile();
+  }
+
+  Transaction get transaction => _transaction;
+  set transaction(Transaction transaction) {
+    _transaction = transaction;
+    writeFile();
   }
 
   static int _lastTimeProgress = 0;

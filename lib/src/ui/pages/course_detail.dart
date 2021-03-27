@@ -1,14 +1,19 @@
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/models/module.dart';
+import 'package:easy_meditation/src/service/rest/_client.dart';
+import 'package:easy_meditation/src/service/ui/lazy_task_service.dart';
+import 'package:easy_meditation/src/service/ui/modal_services.dart';
 import 'package:easy_meditation/src/ui/pages/audio_player_page.dart';
 import 'package:easy_meditation/src/ui/views/colored_background.dart';
 import 'package:easy_meditation/src/ui/widgets/module.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 
 class CourseDetailPageController extends ChangeNotifier {
   CourseDetailPageController();
+
   int _courseId = 0;
 
   int get courseId => _courseId;
@@ -29,6 +34,9 @@ class CourseDetailPage extends StatefulWidget {
 }
 
 class _CourseDetailPageState extends State<CourseDetailPage> {
+  int playingIndex;
+  static final _player = AudioPlayer();
+
   _rebuild() {
     if (super.mounted) setState(() {});
   }
@@ -77,7 +85,8 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
 
     return Scaffold(
       appBar: CupertinoNavigationBar(
-          middle: Text(Module.courses[widget.controller.courseId])),
+        middle: Text(Module.courses[widget.controller.courseId]),
+      ),
       body: ColoredBackground(
         child: CustomScrollView(slivers: [
           SliverToBoxAdapter(
@@ -116,10 +125,17 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                         Expanded(
                           child: TextButton.icon(
                             onPressed: () {
-                              Navigator.of(context)
-                                  .push(MaterialPageRoute(builder: (context) {
-                                return AudioPlayerPage(data[0], data);
-                              }));
+                              if (data.isNotEmpty) {
+                                Navigator.of(context)
+                                    .push(MaterialPageRoute(builder: (context) {
+                                  return AudioPlayerPage(data[0], data);
+                                }));
+                              } else {
+                                ModalService.scaffoldMessengerKey.currentState
+                                    .showSnackBar(
+                                  SnackBar(content: Text('No Modules')),
+                                );
+                              }
                             },
                             label: Text('Start'),
                             style: TextButton.styleFrom(
@@ -207,10 +223,48 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) => ModuleWidget(
-                  data[index],
-                  () => setState(() {
-                        AppData().writeFile();
-                      })),
+                data[index],
+                () => setState(() {
+                  AppData.user.unRecommend(data[index]);
+
+                  if (index < data.length - 1)
+                    AppData.user.recommend(data[index + 1]);
+                  AppData().writeFile();
+                }),
+                index == playingIndex,
+                true,
+                () {
+                  LazyTaskService.execute(context, () async {
+                    AppData.user.unRecommend(data[index]);
+
+                    if (index < data.length - 1)
+                      AppData.user.recommend(data[index + 1]);
+                    if (_player.playing && index == playingIndex) {
+                      await _player.pause();
+                      playingIndex = null;
+                      setState(() {});
+                    } else {
+                      await _player.pause();
+                      await _player.setAudioSource(
+                        LockCachingAudioSource(Uri.parse(
+                          '$apiUrl/courses/modules/' + data[index].id,
+                        )),
+                      );
+
+                      _player.positionStream.listen((event) {
+                        if (_player.duration == null) return;
+                        if ((_player.duration - event).inSeconds == 0) {
+                          playingIndex = null;
+                          setState(() {});
+                        }
+                      });
+
+                      setState(() => playingIndex = index);
+                      _player.play();
+                    }
+                  });
+                },
+              ),
               childCount: data.length,
             ),
           ),

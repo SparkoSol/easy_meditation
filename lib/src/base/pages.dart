@@ -1,8 +1,10 @@
 import 'package:easy_meditation/src/ui/modals/notifications_management.dart';
 import 'package:easy_meditation/src/ui/modals/payment_bottom_sheet.dart';
 import 'package:easy_meditation/src/ui/pages/about_us_page.dart';
+import 'package:easy_meditation/src/ui/pages/forgot_password.dart';
 import 'package:easy_meditation/src/ui/pages/home_page.dart';
 import 'package:easy_meditation/src/ui/pages/login_page.dart';
+import 'package:easy_meditation/src/ui/pages/no_connection_page.dart';
 import 'package:easy_meditation/src/ui/pages/register_page.dart';
 import 'package:easy_meditation/src/ui/pages/splash_screen.dart';
 import 'package:easy_meditation/src/ui/pages/welcome_page.dart';
@@ -25,6 +27,8 @@ abstract class AppPages {
     splash.route: (context) => SplashScreen(),
     temp.route: (context) => PreferencesView(),
     welcome.route: (context) => WelcomePage(),
+    '/no-connection': (context) => NoConnectionPage(),
+    '/forgot-password': (context) => ForgotPassword(),
     notificationsSettings.route: (context) => ReminderManagementPage(),
   };
 

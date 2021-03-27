@@ -1,17 +1,23 @@
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/ui/pages/course_detail.dart';
+import 'package:easy_meditation/src/ui/widgets/module.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/ui/widgets/module_card.dart';
 import 'package:easy_meditation/src/ui/views/colored_background.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   final PageController _pC;
   final CourseDetailPageController _cC;
 
   HomeView([this._pC, this._cC]);
 
+  @override
+  _HomeViewState createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,8 +81,10 @@ class HomeView extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 10, bottom: 15),
                     child: Text(
                       'Choose a Level',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   Row(children: [
@@ -84,8 +92,8 @@ class HomeView extends StatelessWidget {
                       child: ModuleCard(
                         index: 0,
                         onPressed: () {
-                          _pC.jumpToPage(1);
-                          _cC.courseId = 0;
+                          widget._pC.jumpToPage(1);
+                          widget._cC.courseId = 0;
                         },
                       ),
                     ),
@@ -94,8 +102,8 @@ class HomeView extends StatelessWidget {
                       child: ModuleCard(
                         index: 1,
                         onPressed: () {
-                          _pC.jumpToPage(1);
-                          _cC.courseId = 1;
+                          widget._pC.jumpToPage(1);
+                          widget._cC.courseId = 1;
                         },
                       ),
                     ),
@@ -103,8 +111,8 @@ class HomeView extends StatelessWidget {
                   ModuleCard(
                     index: 2,
                     onPressed: () {
-                      _pC.jumpToPage(1);
-                      _cC.courseId = 2;
+                      widget._pC.jumpToPage(1);
+                      widget._cC.courseId = 2;
                     },
                   ),
                   if (AppData.recommended.isNotEmpty) ...[
@@ -185,6 +193,37 @@ class HomeView extends StatelessWidget {
                         ),
                       ]),
                     ),
+                  ],
+
+                  if (AppData.user.recommended?.isNotEmpty == true) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20, bottom: 15),
+                      child: Text(
+                        'Recommended for You',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+
+                    for (var i = 0; i < AppData.user.recommended.length; ++i)
+                      Container(
+                        color: Colors.white,
+                        child: ModuleWidget(
+                          AppData.user.recommended[i],
+                          () {
+                            AppData.user.unRecommend(AppData.user.recommended[i]);
+
+                            if (i < AppData.user.recommended.length - 1)
+                              AppData.user.recommend(AppData.user.recommended[i + 1]);
+
+                            setState(() {});
+                          },
+                          false,
+                          true
+                        ),
+                      ),
                   ]
                 ],
               ),

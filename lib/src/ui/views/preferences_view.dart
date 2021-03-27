@@ -19,6 +19,29 @@ class PreferencesView extends StatefulWidget {
 class _PreferencesViewState extends State<PreferencesView> {
   @override
   Widget build(BuildContext context) {
+    final transaction = AppData().transaction;
+    final difference = transaction.nextAt.difference(DateTime.now());
+
+    print(transaction.nextAt);
+    print(DateTime.now());
+
+    String timeLeft;
+    // if (difference.inDays > 30) {
+    //   timeLeft = (difference.inDays ~/ 30).toString() + ' Months Left';
+    // } else {
+    timeLeft = difference.inDays.toString() + ' Days Left';
+    // }
+
+    Color textColor;
+    Color backgroundColor;
+    if (transaction.amount == 0) {
+      textColor = AppTheme.primaryColor;
+      backgroundColor = AppTheme.primaryColor1;
+    } else {
+      textColor = Color(0xFF00AC06);
+      backgroundColor = Color(0xFFCFEBD7);
+    }
+
     return ColoredBackground(
       child: CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(middle: Text('Account')),
@@ -52,9 +75,13 @@ class _PreferencesViewState extends State<PreferencesView> {
                   ]),
                 ),
                 Container(
-                  constraints: BoxConstraints.expand(height: 125),
+                  constraints: BoxConstraints.expand(
+                    height: difference.inDays < 5 || transaction.amount == 0
+                        ? 125
+                        : 70,
+                  ),
                   decoration: BoxDecoration(
-                    color: Color(0xFFCFEBD7),
+                    color: backgroundColor.withOpacity(.5),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   padding: const EdgeInsets.symmetric(
@@ -64,53 +91,71 @@ class _PreferencesViewState extends State<PreferencesView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Text(
-                      //   'Premium Access',
-                      //   style: TextStyle(
-                      //     fontSize: 16,
-                      //     color: Color(0xFF00AC06),
-                      //     fontWeight: FontWeight.bold,
-                      //   ),
-                      // ),
-                      // SizedBox(height: 10),
-                      // Text(
-                      //   '27 days left',
-                      //   style: TextStyle(color: Colors.grey.shade600),
-                      // ),
-                      Spacer(),
-                      TextButton(
-                        onPressed: () {
-                          print("called");
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(30),
-                              ),
-                            ),
-                            builder: (context) => PaymentBottomSheet(),
-                          );
-                        },
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(CupertinoIcons.capslock, size: 17),
-                            SizedBox(width: 20),
-                            Text('Upgrade')
-                          ],
-                        ),
-                        style: TextButton.styleFrom(
-                          primary: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6)),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 13,
-                            horizontal: 40,
+                      if (transaction.amount == 0) ...[
+                        Text(
+                          'Trial Access',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: textColor,
+                            fontWeight: FontWeight.bold,
                           ),
-                          backgroundColor: Color(0xFF5DC863),
                         ),
-                      )
+                        SizedBox(height: 10),
+                        Text(
+                          timeLeft,
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                      ] else ...[
+                        Text(
+                          'Trial Access',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF00AC06),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          '${transaction.requiredAt.difference(DateTime.now()).inDays} days left',
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                      ],
+                      Spacer(),
+                      if (difference.inDays < 5 || transaction.amount == 0)
+                        TextButton(
+                          onPressed: () async  {
+                            await showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(30),
+                                ),
+                              ),
+                              builder: (context) => PaymentBottomSheet(),
+                            );
+
+                            setState(() {});
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(CupertinoIcons.capslock, size: 17),
+                              SizedBox(width: 20),
+                              Text('Upgrade')
+                            ],
+                          ),
+                          style: TextButton.styleFrom(
+                            primary: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6)),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 13,
+                              horizontal: 40,
+                            ),
+                            backgroundColor: textColor,
+                          ),
+                        )
                     ],
                   ),
                 ),
@@ -118,11 +163,14 @@ class _PreferencesViewState extends State<PreferencesView> {
                   padding: const EdgeInsets.only(bottom: 10, top: 30),
                   child: Text('Other', style: AppTheme.sectionHeaderStyle),
                 ),
-                PreferenceTile(title: 'Account Settings', onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                    return AccountSettingsPage();
-                  }));
-                }),
+                PreferenceTile(
+                    title: 'Account Settings',
+                    onPressed: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return AccountSettingsPage();
+                      }));
+                    }),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: PreferenceTile(
@@ -201,10 +249,13 @@ class _PreferencesViewState extends State<PreferencesView> {
                                             () async {
                                               await AppData().deleteUser();
                                               AppData().accessToken = null;
+                                              AppData().transaction = null;
                                             },
                                           );
 
-                                          Navigator.of(context).pushNamedAndRemoveUntil('/sign-in', (route) => false);
+                                          Navigator.of(context)
+                                              .pushNamedAndRemoveUntil(
+                                                  '/sign-in', (route) => false);
                                         },
                                         child: Text('Logout'),
                                         style: TextButton.styleFrom(

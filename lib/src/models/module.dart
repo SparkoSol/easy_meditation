@@ -23,4 +23,17 @@ class Module {
 
   factory Module.fromJson(Map<String, dynamic> json) => _$ModuleFromJson(json);
   toJson() => _$ModuleToJson(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (other is Module) {
+      return other.id == id;
+    }
+
+    return false;
+  }
+
+  @override
+  int get hashCode => super.hashCode;
+
 }

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/models/sign_in_request.dart';
+import 'package:easy_meditation/src/models/card.dart' as c;
+import 'package:easy_meditation/src/models/transaction.dart';
 import 'package:easy_meditation/src/service/rest/_client.dart';
 import 'package:easy_meditation/src/service/ui/lazy_task_service.dart';
 import 'package:easy_meditation/src/service/ui/modal_services.dart';
@@ -59,49 +61,66 @@ class SocialLoginService {
 
   static signInOrRegister(BuildContext context, User result) async {
     await LazyTaskService.execute(context, () async {
-      final request = SignInRequest()
+      final req = SignInRequest()
         ..username = result.email
         ..password = result.uid + '_easy_meditation';
 
       var response = await http.post(
         Uri.parse('$apiUrl/auth/sign-in'),
-        body: jsonEncode(request.toJson()),
+        body: jsonEncode(req.toJson()),
+        headers: {'content-type': 'application/json'},
       );
+
+      var data = jsonDecode(response.body)['access_token'];
+      AppData().accessToken = data;
 
       if (response.statusCode == 401) {
         var flag = false;
-        LazyTaskService.execute(context, () async {
-          try {
-            final user = r.User()
-              ..username = request.username
-              ..password = request.password
-              ..name = result.displayName
-              ..email = request.username;
+        await LazyTaskService.execute(context, () async {
+          final user = r.User()
+            ..username = req.username
+            ..password = req.password
+            ..name = result.displayName
+            ..email = req.username
+            ..scope = [2];
 
-            final response = await http.post(
-              Uri.parse('$apiUrl/users'),
-              body: jsonEncode(user.toJson()),
-            );
-          } catch (e) {
-            print('User Exists');
+          final response = await http.post(
+            Uri.parse('$apiUrl/users'),
+            body: jsonEncode(user.toJson()),
+            headers: {'content-type': 'application/json'},
+          );
+
+          if (response.statusCode == 500) {
+            ModalService.scaffoldMessengerKey.currentState
+                .showSnackBar(SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Unable to create account. This email has already been linked to another account',
+              ),
+            ));
+
+            return;
           }
 
           flag = true;
         });
 
-        if (flag) {
-          final request = SignInRequest()
-            ..username = result.email
-            ..password = result.uid + '_easy_meditation';
+        if (!flag) return;
 
-          var response = await http.post(
-            Uri.parse('$apiUrl/auth/sign-in'),
-            body: jsonEncode(request.toJson()),
-          );
+        final request = SignInRequest()
+          ..username = result.email
+          ..password = result.uid + '_easy_meditation';
 
-          var data = jsonDecode(response.body)['access_token'];
-          AppData().accessToken = data;
-        }
+        var response = await http.post(
+          Uri.parse('$apiUrl/auth/sign-in'),
+          body: jsonEncode(request.toJson()),
+          headers: {'content-type': 'application/json'},
+        );
+
+        print(response.body);
+
+        var data = jsonDecode(response.body)['access_token'];
+        AppData().accessToken = data;
       } else if (response.statusCode == 500) {
         ModalService.scaffoldMessengerKey.currentState.showSnackBar(
           SnackBar(
@@ -112,18 +131,28 @@ class SocialLoginService {
         return;
       }
 
-      var data;
-
-      response = await http.get(Uri.parse('$apiUrl/auth/profile'));
+      response = await http.get(Uri.parse('$apiUrl/auth/profile'),
+          headers: {'authorization': 'bearer ${AppData().accessToken}'});
       data = jsonDecode(response.body);
+      print(data);
       if (data.containsKey('user'))
         AppData().saveUser(r.User.fromJson(data['user']));
       if (data.containsKey('favorites'))
         AppData.favorites.addAll(data['favorites']);
+      if (data.containsKey('card'))
+        AppData().card = c.Card.fromJson(data['card']);
     });
 
     if (AppData.user != null) {
       if (AppData.user.scope.contains(2)) {
+        final response = await http.get(Uri.parse(
+          '$apiUrl/users/${AppData.user?.username}/last-transaction',
+        ));
+        print(response.body);
+
+        AppData().transaction =
+            Transaction.fromJson(jsonDecode(response.body)[0]);
+
         Navigator.of(context).pushNamedAndRemoveUntil('/', (_) => false);
       } else {
         AppData()

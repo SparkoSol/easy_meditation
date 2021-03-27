@@ -1,13 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:easy_meditation/src/base/assets.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/models/register_request.dart';
+import 'package:easy_meditation/src/service/auth_service.dart';
 import 'package:easy_meditation/src/service/rest/_client.dart';
 import 'package:easy_meditation/src/service/ui/lazy_task_service.dart';
 import 'package:easy_meditation/src/service/ui/modal_services.dart';
 import 'package:easy_meditation/src/ui/views/imaged_view.dart';
 import 'package:easy_meditation/src/ui/widgets/text_field.dart';
 import 'package:easy_meditation/src/utils/input_validators.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -27,7 +31,13 @@ class _RegisterPageState extends State<RegisterPage> {
     final height = MediaQuery.of(context).size.height / 7;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       extendBody: true,
+      extendBodyBehindAppBar: true,
+      appBar: CupertinoNavigationBar(
+        backgroundColor: Colors.transparent,
+        border: Border.all(color: Colors.transparent),
+      ),
       body: ImagedView(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -44,17 +54,21 @@ class _RegisterPageState extends State<RegisterPage> {
                 label: 'Full Name',
                 onSaved: (val) => user.name = val,
                 validator: InputValidators.required,
-                prefixIcon: Icon(Icons.email, color: Colors.white),
+                // prefixIcon: Icon(Icons.email, color: Colors.white),
               ),
               SizedBox(height: 20),
               AppTextField(
                 label: 'Email',
                 onSaved: (val) => user.email = val,
-                validator: InputValidators.required,
-                prefixIcon: Icon(Icons.lock_outline, color: Colors.white),
+                validator: InputValidators.multiple([
+                  InputValidators.required,
+                  InputValidators.email,
+                ]),
+                prefixIcon: Icon(Icons.email, color: Colors.white),
               ),
               SizedBox(height: 20),
               AppTextField(
+                password: true,
                 label: 'Password',
                 validator: InputValidators.required,
                 onSaved: (val) => user.password = val,
@@ -77,7 +91,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ]),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   if (!flag) {
                     _checkTermsAndConditions();
                     return;
@@ -85,24 +99,24 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   if (formKey.currentState.validate()) {
                     formKey.currentState.save();
+                    FocusScope.of(context).unfocus();
 
                     var flag = false;
-                    LazyTaskService.execute(context, () async {
-                      try {
-                        final response = await http.post(
-                          Uri.parse('$apiUrl/users'),
-                          body: jsonEncode(user.toJson()),
-                        );
-                      } catch (e) {
-                        if (e.response.statusCode == 400) {
-                          ModalService.scaffoldMessengerKey.currentState
-                              .showSnackBar(SnackBar(
-                            behavior: SnackBarBehavior.floating,
-                            content: Text('A user with same email exists'),
-                          ));
+                    await LazyTaskService.execute(context, () async {
+                      final response = await http.post(
+                        Uri.parse('$apiUrl/users'),
+                        body: jsonEncode(user.toJson()),
+                        headers: { 'content-type': 'application/json' }
+                      );
 
-                          return;
-                        }
+                      if (response.statusCode == 500) {
+                        ModalService.scaffoldMessengerKey.currentState
+                            .showSnackBar(SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          content: Text('A user with same email exists'),
+                        ));
+
+                        return;
                       }
 
                       flag = true;
@@ -133,27 +147,64 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               Row(
                 children: [
-                  Container(
-                    width: 55,
-                    height: 55,
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        color: Color(0xFF7583CA), shape: BoxShape.circle),
+                  GestureDetector(
+                    onTap: () async {
+                      if (!flag) {
+                        _checkTermsAndConditions();
+                        return;
+                      }
+                      await SocialLoginService.facebookAuth((result) async {
+                        FocusScope.of(context).unfocus();
+                        SocialLoginService.signInOrRegister(context, result);
+                      });
+                    },
+                    child: Container(
+                      width: 55,
+                      height: 55,
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF7583CA),
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: AssetImage(Assets.facebookIcon),
+                        ),
+                      ),
+                    ),
                   ),
-                  Container(
-                    width: 55,
-                    height: 55,
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        color: Colors.white, shape: BoxShape.circle),
+                  GestureDetector(
+                    onTap: () async {
+                      if (!flag) {
+                        _checkTermsAndConditions();
+                        return;
+                      }
+                      await SocialLoginService.googleAuth((result) {
+                        FocusScope.of(context).unfocus();
+                        SocialLoginService.signInOrRegister(context, result);
+                      });
+                    },
+                    child: Container(
+                      width: 55,
+                      height: 55,
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: AssetImage(Assets.googleIcon),
+                        ),
+                      ),
+                    ),
                   ),
-                  Container(
-                    width: 55,
-                    height: 55,
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        color: Colors.black, shape: BoxShape.circle),
-                  ),
+                  if (Platform.isIOS)
+                    Container(
+                      width: 55,
+                      height: 55,
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
                 ],
                 mainAxisAlignment: MainAxisAlignment.center,
               ),
@@ -190,7 +241,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void _checkTermsAndConditions() {
     ModalService.scaffoldMessengerKey.currentState.showSnackBar(
-      SnackBar(content: Text('Accept Terms and Conditions First!')),
+      SnackBar(content: Text('Accept Terms and Conditions First!'), behavior: SnackBarBehavior.floating,),
     );
   }
 }

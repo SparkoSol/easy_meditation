@@ -12,7 +12,7 @@ class NotificationsService {
     _plugin = FlutterLocalNotificationsPlugin();
     await _plugin.initialize(
       InitializationSettings(
-        android: AndroidInitializationSettings('ic_launcher'),
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
       ),
       onSelectNotification: (d) async => print('notification selected: $d'),
     );

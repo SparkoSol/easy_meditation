@@ -23,13 +23,15 @@ class _WelcomePageState extends State<WelcomePage> {
       builder: (_, lang) => Material(
         color: Colors.white,
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.fromLTRB(8, MediaQuery.of(context).padding.top + 8, 8, 8),
           child: Column(
             children: [
               Align(
                 alignment: Alignment.centerRight,
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).pushReplacementNamed('/sign-in');
+                  },
                   child: Text(lang.skip),
                 ),
               ),

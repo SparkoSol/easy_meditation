@@ -147,6 +147,7 @@ class StripeService {
                 paymentMethodId: paymentMethod.id
             ));
       }catch (e){
+        print('Error here');
         print(e);
       }
 

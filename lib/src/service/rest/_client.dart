@@ -1,4 +1,5 @@
-const apiUrl = 'http://192.168.1.8:4000';
+const apiUrl = 'https://mysterious-garden-78033.herokuapp.com';
+// 'http://192.168.1.8:4000';
 // import 'package:dio/dio.dart';
 // import 'package:easy_meditation/src/base/data.dart';
 // import 'package:flutter/foundation.dart';

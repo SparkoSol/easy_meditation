@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+// import 'package:connectivity/connectivity.dart';
 import 'package:easy_meditation/src/base/data.dart';
+import 'package:easy_meditation/src/models/transaction.dart';
+import 'package:easy_meditation/src/service/rest/_client.dart';
 import 'package:easy_meditation/src/service/ui/notifications_service.dart';
-import 'package:easy_meditation/src/ui/modals/notifications_management.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -46,20 +51,37 @@ class _SplashScreenState extends State<SplashScreen>
           await AppData.initiate();
           await NotificationsService.initialize();
 
-          /// TODO: Precache data.
-
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil('/welcome', (_) => false);
-          // if (AppData().isFirst) {
-          //
+          // var result = await (Connectivity().checkConnectivity());
+          // if (result == ConnectivityResult.mobile ||
+          //     result == ConnectivityResult.wifi) {
           // } else {
-          //   if (AppData.user != null) {
-          //     Navigator.of(context).pushNamedAndRemoveUntil('/', (_) => false);
-          //   } else {
-          //     Navigator.of(context)
-          //         .pushNamedAndRemoveUntil('/sign-in', (_) => false);
-          //   }
+          //   Navigator.of(context)
+          //       .pushNamedAndRemoveUntil('/no-connection', (_) => false);
+          //   return;
           // }
+
+          if (AppData.user != null) {
+            print('$apiUrl/users/${AppData.user?.username}/last-transaction');
+            final response = await http.get(Uri.parse(
+              '$apiUrl/users/${AppData.user?.username}/last-transaction',
+            ));
+            print(response.body);
+
+            AppData().transaction =
+                Transaction.fromJson(jsonDecode(response.body)[0]);
+          }
+
+          if (AppData().isFirst) {
+            Navigator.of(context)
+                .pushNamedAndRemoveUntil('/welcome', (_) => false);
+          } else {
+            if (AppData.user != null) {
+              Navigator.of(context).pushNamedAndRemoveUntil('/', (_) => false);
+            } else {
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/sign-in', (_) => false);
+            }
+          }
         }
       });
 

@@ -1,5 +1,6 @@
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/base/pages.dart';
+import 'package:easy_meditation/src/service/ui/lazy_task_service.dart';
 import 'package:easy_meditation/src/service/ui/modal_services.dart';
 import 'package:easy_meditation/src/service/ui/notifications_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -20,6 +21,23 @@ class App extends StatefulWidget {
   static Future<void> initializeAndRun() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
+    LazyTaskService.dialog = Dialog(
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Row(children: [
+          SizedBox(
+            width: 30,
+            height: 30,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation(AppTheme.primaryColor),
+            ),
+          ),
+          SizedBox(width: 10),
+          Text('Loading')
+        ]),
+      ),
+    );
 
     return runApp(const App._());
   }

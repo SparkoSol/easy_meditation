@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppTextField extends StatelessWidget {
   final String label;
+  final bool password;
   final Widget prefixIcon;
   final Widget suffixIcon;
 
@@ -11,6 +12,7 @@ class AppTextField extends StatelessWidget {
   AppTextField({
     this.label,
     this.onSaved,
+    this.password = false,
     this.validator,
     this.prefixIcon,
     this.suffixIcon,
@@ -23,6 +25,7 @@ class AppTextField extends StatelessWidget {
       child: TextFormField(
         onSaved: onSaved,
         validator: validator,
+        obscureText: password,
         style: TextStyle(color: Colors.white),
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.all(12),

@@ -20,13 +20,31 @@ class ModuleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Color color;
     dynamic child;
-    var isAllowed = true;
+    var isAllowed =
+        AppData().transaction.nextAt.difference(DateTime.now()).inSeconds > 0;
 
     if (index == 0) {
       color = Color(0xFF353961);
     } else if (index == 1) {
       color = Color(0xFFFFC97E);
     }
+
+    final onTap = () {
+      if (!isAllowed) {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(30),
+            ),
+          ),
+          builder: (context) => PaymentBottomSheet(),
+        );
+      } else {
+        onPressed();
+      }
+    };
 
     if (index == 2) {
       color = Color(0xFF595867);
@@ -74,7 +92,7 @@ class ModuleCard extends StatelessWidget {
                           primary: AppTheme.primaryColor,
                           backgroundColor: Colors.white,
                         ),
-                        onPressed: () {},
+                        onPressed: onTap,
                         child: Text('START'),
                       )
                     ],
@@ -83,7 +101,7 @@ class ModuleCard extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: 20),
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: onTap,
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.white,
                         minimumSize: Size(30, 30),
@@ -145,7 +163,7 @@ class ModuleCard extends StatelessWidget {
                         width: 40,
                         height: 40,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: onTap,
                           style: TextButton.styleFrom(
                             backgroundColor: Colors.white,
                             minimumSize: Size(30, 30),
@@ -198,7 +216,7 @@ class ModuleCard extends StatelessWidget {
                         style: TextButton.styleFrom(
                             primary: Colors.white,
                             backgroundColor: Color(0xFF3F414E)),
-                        onPressed: () {},
+                        onPressed: onTap,
                         child: Text('START'),
                       )
                     ])
@@ -223,15 +241,21 @@ class ModuleCard extends StatelessWidget {
             if (modules.isNotEmpty) {
               data = modules ?? [];
             } else {
-              return SizedBox(
+              return Container(
                 height: 190,
-                width: 100,
-                child: Shimmer.fromColors(
-                  child: SizedBox(),
-                  baseColor: Colors.grey,
-                  highlightColor: Colors.white,
+                decoration: BoxDecoration(
+                    color: color.withOpacity(.2),
+                    borderRadius: BorderRadius.circular(8)),
+                child: Center(
+                  child: CircularProgressIndicator(),
                 ),
               );
+              // return Stack(children: [
+              //   Opacity(
+              //     opacity: 0.5,
+              //     child: child,
+              //   )
+              // ]);
             }
             break;
           case ConnectionState.done:
@@ -245,22 +269,7 @@ class ModuleCard extends StatelessWidget {
         }
 
         return GestureDetector(
-          onTap: () {
-            if (!isAllowed) {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(30),
-                  ),
-                ),
-                builder: (context) => PaymentBottomSheet(),
-              );
-            } else {
-              onPressed();
-            }
-          },
+          onTap: onTap,
           child: child(data),
         );
       },

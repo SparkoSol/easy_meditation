@@ -24,6 +24,7 @@ class _DatePickerFormFieldState extends State<DatePickerFormField> {
   set date(DateTime date) {
     _rawDate = date;
     _controller.text = DateFormat(DateFormat.YEAR_MONTH).format(date);
+    widget.onChanged(date);
   }
 
   @override

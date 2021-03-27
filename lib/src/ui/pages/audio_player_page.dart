@@ -41,10 +41,11 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isFav = AppData.favorites.contains(controller.module.id);
+    final isFav = AppData.favorites.contains(module.id);
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
+        border: Border.all(color: Colors.transparent),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
           child: Icon(
@@ -69,13 +70,15 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                     if (isFav) {
                       module.favorites--;
                       http.delete(
-                          Uri.parse('/courses/modules/${module.id}/unmark-fav'),
+                          Uri.parse(
+                              '$apiUrl/courses/modules/${module.id}/unmark-fav'),
                           body: jsonEncode({"userId": AppData.user.id}));
                       AppData.favorites.remove(module.id);
                     } else {
                       module.favorites++;
                       http.post(
-                        Uri.parse('/courses/modules/${module.id}/mark-fav'),
+                        Uri.parse(
+                            '$apiUrl/courses/modules/${module.id}/mark-fav'),
                         body: jsonEncode({"userId": AppData.user.id}),
                       );
 
@@ -170,6 +173,10 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
 
                         timeElapsed = snapshot.data;
                         timeLeft = controller.currentDuration - timeElapsed;
+                      }
+
+                      if (progress == 1) {
+                        controller.playNext();
                       }
 
                       return Column(
@@ -345,28 +352,43 @@ class SeekControl extends TextButton {
 
 class PlaylistController extends ChangeNotifier {
   final List<Module> _songs;
-  final _player = AudioPlayer();
+  var _player = AudioPlayer();
 
   PlaylistController(this._songs, [this.autoplay = false]) {
+    _module = _songs[_index];
     _loadModule(_songs[_index]);
   }
 
   Module _module;
   var _index = 0;
   var _repeat = false;
-  var _loading = false;
+  var _loading = true;
   var _playing = false;
 
   var autoplay = false;
-  StreamSubscription _streamSub;
 
-  void _loadModule(Module module) async {
+  Future _loadModule(Module module) async {
+    try {
+      await http.post(
+        Uri.parse('$apiUrl/courses/modules/${module.id}/mark-listened'),
+        body: jsonEncode({'userId': AppData.user.id}),
+        headers: {'content-type': 'application/json'},
+      );
+      ++module.listened;
+    } catch (e) {
+      print(e);
+    }
+
     _module = module;
     _loading = true;
     _playing = false;
     notifyListeners();
 
     final url = '$apiUrl/courses/modules/' + module.id;
+    AppData.user.unRecommend(module);
+    if (index < _songs.length - 1) {
+       AppData.user.recommend(_songs[index + 1]);
+    }
 
     _player.setAudioSource(
       LockCachingAudioSource(Uri.parse(url)),
@@ -382,14 +404,6 @@ class PlaylistController extends ChangeNotifier {
     } else {
       notifyListeners();
     }
-
-    _player.processingStateStream.listen((event) {
-      if (event == ProcessingState.completed) {
-        playNext();
-      }
-    });
-
-    print('Stream sub: ' + _streamSub.toString());
   }
 
   void play() async {
@@ -441,10 +455,10 @@ class PlaylistController extends ChangeNotifier {
   }
 
   playNext() async {
-    if (_index < _songs.length - 1)
+    if (_index < _songs.length - 1) {
       _loadModule(_songs[++_index]);
-    else if (_repeat) {
-      _player.setLoopMode(LoopMode.all);
+    } else if (_repeat) {
+      _loadModule(_songs[_index = 0]);
     }
   }
 

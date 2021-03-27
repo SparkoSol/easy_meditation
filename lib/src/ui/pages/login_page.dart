@@ -5,8 +5,10 @@ import 'package:easy_meditation/src/base/assets.dart';
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/base/pages.dart';
 import 'package:easy_meditation/src/base/theme.dart';
+import 'package:easy_meditation/src/models/card.dart' as c;
 import 'package:easy_meditation/src/models/register_request.dart';
 import 'package:easy_meditation/src/models/sign_in_request.dart';
+import 'package:easy_meditation/src/models/transaction.dart';
 import 'package:easy_meditation/src/service/auth_service.dart';
 import 'package:easy_meditation/src/service/rest/_client.dart';
 import 'package:easy_meditation/src/service/ui/lazy_task_service.dart';
@@ -32,6 +34,7 @@ class SignInPage extends StatelessWidget {
     final height = MediaQuery.of(context).size.height / 7;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: ImagedView(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -46,34 +49,45 @@ class SignInPage extends StatelessWidget {
               SizedBox(height: height),
               AppTextField(
                 label: 'Email',
-                validator: InputValidators.required,
+                validator: InputValidators.multiple([
+                  InputValidators.required,
+                  InputValidators.email,
+                ]),
                 onSaved: (val) => request.username = val,
                 prefixIcon: Icon(Icons.email, color: Colors.white),
               ),
               SizedBox(height: 20),
               AppTextField(
                 label: 'Password',
+                password: true,
                 validator: InputValidators.required,
                 onSaved: (val) => request.password = val,
                 prefixIcon: Icon(Icons.lock_outline, color: Colors.white),
               ),
               Align(
                 alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 10, bottom: 10),
-                  child: Text('Forgot password?'),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/forgot-password');
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
+                    child: Text('Forgot password?'),
+                  ),
                 ),
               ),
               TextButton(
                 onPressed: () async {
                   if (formKey.currentState.validate()) {
                     formKey.currentState.save();
+                    FocusScope.of(context).unfocus();
 
                     await LazyTaskService.execute(context, () async {
                       var response = await http.post(
-                        Uri.parse('$apiUrl/auth/sign-in'),
-                        body: jsonEncode(request.toJson()),
-                      );
+                          Uri.parse('$apiUrl/auth/sign-in'),
+                          body: jsonEncode(request.toJson()),
+                          headers: {'content-type': 'application/json'});
+
                       if (response.statusCode == 401) {
                         print('here');
                         ModalService.scaffoldMessengerKey.currentState
@@ -89,7 +103,8 @@ class SignInPage extends StatelessWidget {
                             .showSnackBar(
                           SnackBar(
                             behavior: SnackBarBehavior.floating,
-                            content: Text('There is some error at server side.'),
+                            content:
+                                Text('There is some error at server side.'),
                           ),
                         );
                         return;
@@ -98,15 +113,28 @@ class SignInPage extends StatelessWidget {
                       var data = jsonDecode(response.body)['access_token'];
                       AppData().accessToken = data;
 
-                      response = await http.get(Uri.parse('$apiUrl/auth/profile'));
+                      response = await http.get(
+                        Uri.parse('$apiUrl/auth/profile'),
+                        headers: {'authorization': 'bearer $data'},
+                      );
+
                       data = jsonDecode(response.body);
                       if (data.containsKey('user'))
                         AppData().saveUser(User.fromJson(data['user']));
                       if (data.containsKey('favorites'))
                         AppData.favorites.addAll(data['favorites']);
+                      if (data.containsKey('card'))
+                        AppData().card = c.Card.fromJson(data['card']);
                     });
 
                     if (AppData.user != null) {
+                      final response = await http.get(Uri.parse(
+                        '$apiUrl/users/${AppData.user?.username}/last-transaction',
+                      ));
+
+                      AppData().transaction =
+                          Transaction.fromJson(jsonDecode(response.body)[0]);
+
                       if (AppData.user.scope.contains(2)) {
                         Navigator.of(context)
                             .pushNamedAndRemoveUntil('/', (_) => false);
@@ -123,7 +151,7 @@ class SignInPage extends StatelessWidget {
                   }
                 },
                 child: Text(
-                  'LOGIN',
+                  'SIGN IN',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 style: TextButton.styleFrom(
@@ -138,7 +166,7 @@ class SignInPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: Text(
-                  'OR SIGN UP WITH',
+                  'OR SIGN IN WITH',
                   style: TextStyle(color: Colors.grey.shade700),
                 ),
               ),
@@ -147,6 +175,7 @@ class SignInPage extends StatelessWidget {
                   GestureDetector(
                     onTap: () async {
                       await SocialLoginService.facebookAuth((result) async {
+                        FocusScope.of(context).unfocus();
                         SocialLoginService.signInOrRegister(context, result);
                       });
                     },
@@ -166,6 +195,7 @@ class SignInPage extends StatelessWidget {
                   GestureDetector(
                     onTap: () async {
                       await SocialLoginService.googleAuth((result) {
+                        FocusScope.of(context).unfocus();
                         SocialLoginService.signInOrRegister(context, result);
                       });
                     },

@@ -5,7 +5,6 @@ import 'package:easy_meditation/src/service/rest/modules_rest.dart';
 import 'package:easy_meditation/src/ui/modals/payment_bottom_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 
 class ModuleCard extends StatelessWidget {
   final int index;

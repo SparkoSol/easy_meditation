@@ -37,11 +37,6 @@ class _CardDetailsViewState extends State<CardDetailsView> {
 
     final date = _card?.expiryDate?.split(':') ?? ['0', '0'];
 
-    type = [_card?.type == 'visa', _card?.type == 'master-card'];
-    if (type[0] == false && type[1] == false) {
-      type[0] = true;
-    }
-
     card
       ..name = _card?.fullName
       ..number = _card?.cardNumber
@@ -79,41 +74,6 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                     ),
                   ),
                 ],
-              ),
-            ),
-
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: ToggleButtons(
-                  borderRadius: BorderRadius.circular(4),
-                  children: [
-                    SizedBox(
-                      width: 100,
-                      child: Center(child: Text('visa')),
-                    ),
-                    SizedBox(
-                      width: 100,
-                      child: Center(child: Text('master-card')),
-                    ),
-                  ],
-                  fillColor: AppTheme.primaryColor1.withOpacity(.5),
-                  selectedColor: AppTheme.primaryColor,
-                  color: Colors.grey,
-                  onPressed: (index) {
-                    setState(() {
-                      if (index == 0) {
-                        type[0] = true;
-                        type[1] = false;
-                      } else {
-                        type[0] = false;
-                        type[1] = true;
-                      }
-                    });
-                  },
-                  isSelected: type,
-                ),
               ),
             ),
 
@@ -243,22 +203,6 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                   primary: Colors.white,
                   minimumSize: Size.fromHeight(55),
                   backgroundColor: AppTheme.primaryColor,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10, bottom: 20),
-              child: OutlinedButton(
-                onPressed: () async {
-                  print('Not yet implemented');
-                },
-                child: Text('PAY WITH PAYPAL', style: TextStyle(fontSize: 18)),
-                style: OutlinedButton.styleFrom(
-                  primary: AppTheme.primaryColor,
-                  side: BorderSide(color: AppTheme.primaryColor),
-                  minimumSize: Size.fromHeight(55),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),

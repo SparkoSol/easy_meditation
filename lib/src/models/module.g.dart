@@ -12,6 +12,7 @@ Module _$ModuleFromJson(Map<String, dynamic> json) {
     ..length = (json['length'] as num)?.toDouble()
     ..name = json['name'] as String
     ..trackId = json['trackId'] as String
+    ..description = json['description'] as String
     ..courseNumber = json['courseNumber'] as int
     ..favorites = json['favorites'] as int
     ..listened = json['listened'] as int;
@@ -22,6 +23,7 @@ Map<String, dynamic> _$ModuleToJson(Module instance) => <String, dynamic>{
       'length': instance.length,
       'name': instance.name,
       'trackId': instance.trackId,
+      'description': instance.description,
       'courseNumber': instance.courseNumber,
       'favorites': instance.favorites,
       'listened': instance.listened,

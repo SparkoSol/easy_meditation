@@ -11,6 +11,7 @@ class Module {
   double length;
   String name;
   String trackId;
+  String description;
   int courseNumber;
 
   int favorites = 0;

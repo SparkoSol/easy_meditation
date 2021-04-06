@@ -41,12 +41,12 @@ class _ModuleWidgetState extends State<ModuleWidget> {
       child: Column(children: [
         ListTile(
           onTap: () async {
+            await widget.onPressed?.call();
             if (widget.openPlayer) {
               await Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => AudioPlayerPage(widget.module),
               ));
             }
-            widget.onPressed?.call();
           },
           leading: OutlinedButton(
             child: icon,

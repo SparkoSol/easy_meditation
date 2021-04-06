@@ -66,6 +66,33 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
               height: 30,
               child: TextButton(
                 onPressed: () async {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Description'),
+                      content: Text(module.description),
+                    ),
+                  );
+                },
+                style: TextButton.styleFrom(
+                  primary: AppTheme.primaryColor,
+                  padding: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
+                child: Icon(
+                  CupertinoIcons.info,
+                  size: 22,
+                  color: isFav ? AppTheme.primaryColor : Colors.grey.shade800,
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 30,
+              height: 30,
+              child: TextButton(
+                onPressed: () async {
                   LazyTaskService.execute(context, () async {
                     if (isFav) {
                       module.favorites--;
@@ -387,7 +414,7 @@ class PlaylistController extends ChangeNotifier {
     final url = '$apiUrl/courses/modules/' + module.id;
     AppData.user.unRecommend(module);
     if (index < _songs.length - 1) {
-       AppData.user.recommend(_songs[index + 1]);
+      AppData.user.recommend(_songs[index + 1]);
     }
 
     _player.setAudioSource(

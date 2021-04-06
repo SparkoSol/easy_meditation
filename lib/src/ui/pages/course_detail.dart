@@ -224,13 +224,17 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
             delegate: SliverChildBuilderDelegate(
               (context, index) => ModuleWidget(
                 data[index],
-                () => setState(() {
-                  AppData.user.unRecommend(data[index]);
+                () async {
+                  await _player.pause();
+                  playingIndex = null;
+                  setState(() {
+                    AppData.user.unRecommend(data[index]);
 
-                  if (index < data.length - 1)
-                    AppData.user.recommend(data[index + 1]);
-                  AppData().writeFile();
-                }),
+                    if (index < data.length - 1)
+                      AppData.user.recommend(data[index + 1]);
+                    AppData().writeFile();
+                  });
+                },
                 index == playingIndex,
                 true,
                 () {

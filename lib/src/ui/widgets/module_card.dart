@@ -243,6 +243,7 @@ class ModuleCard extends StatelessWidget {
             } else {
               return Container(
                 height: 190,
+                margin: EdgeInsets.only(top: index == 2 ? 20 : 0),
                 decoration: BoxDecoration(
                     color: color.withOpacity(.2),
                     borderRadius: BorderRadius.circular(8)),

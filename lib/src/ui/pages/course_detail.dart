@@ -286,8 +286,13 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
       return value;
     }
 
+    String msString;
     final minutes = value.inMinutes.remainder(Duration.minutesPerHour);
-    final msString = '${twoDigit(minutes)} MINUTES';
+    if (minutes >= 1) {
+      msString = '${twoDigit(minutes)} MINUTES';
+    } else {
+      msString = '${twoDigit(value.inSeconds.remainder(Duration.secondsPerMinute))} SECONDS';
+    }
 
     final hours = value.inHours;
     if (hours > 0) {

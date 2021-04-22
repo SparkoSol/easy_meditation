@@ -128,7 +128,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                               if (data.isNotEmpty) {
                                 Navigator.of(context)
                                     .push(MaterialPageRoute(builder: (context) {
-                                  return AudioPlayerPage(data[0], data);
+                                  return AudioPlayerPage(data[0], data, widget.controller.courseId);
                                 }));
                               } else {
                                 ModalService.scaffoldMessengerKey.currentState

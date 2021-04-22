@@ -16,8 +16,9 @@ import 'package:just_audio/just_audio.dart';
 class AudioPlayerPage extends StatefulWidget {
   final Module module;
   final List<Module> otherModules;
+  final int index;
 
-  AudioPlayerPage(this.module, [this.otherModules = const []]);
+  AudioPlayerPage(this.module, [this.otherModules = const [], this.index = 0]);
 
   @override
   _AudioPlayerPageState createState() => _AudioPlayerPageState();
@@ -34,7 +35,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
     controller = PlaylistController(
       widget.otherModules.isNotEmpty ? widget.otherModules : [widget.module],
       true,
-    )..addListener(_rebuild);
+      widget.index
+    )
+      ..addListener(_rebuild);
   }
 
   Module get module => controller.module;
@@ -53,7 +56,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
             size: 30,
             color: AppTheme.darkBlueColor,
           ),
-          onPressed: Navigator.of(context).pop,
+          onPressed: Navigator
+              .of(context)
+              .pop,
         ),
         backgroundColor: Colors.transparent,
         padding: EdgeInsetsDirectional.zero,
@@ -68,10 +73,11 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                 onPressed: () async {
                   showDialog(
                     context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text('Description'),
-                      content: Text(module.description),
-                    ),
+                    builder: (context) =>
+                        AlertDialog(
+                          title: Text('Description'),
+                          content: Text(module.description),
+                        ),
                   );
                 },
                 style: TextButton.styleFrom(
@@ -84,7 +90,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                 child: Icon(
                   CupertinoIcons.info,
                   size: 22,
-                  color: isFav ? AppTheme.primaryColor : Colors.grey.shade800,
+                  color: Colors.grey.shade800,
                 ),
               ),
             ),
@@ -98,7 +104,8 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                       module.favorites--;
                       http.delete(
                           Uri.parse(
-                              '$apiUrl/courses/modules/${module.id}/unmark-fav'),
+                              '$apiUrl/courses/modules/${module
+                                  .id}/unmark-fav'),
                           body: jsonEncode({"userId": AppData.user.id}));
                       AppData.favorites.remove(module.id);
                     } else {
@@ -180,9 +187,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SeekControl(controller._player),
+                      SeekControl(controller._player, false, controller),
                       PlayPauseButton(player: controller),
-                      SeekControl(controller._player, true),
+                      SeekControl(controller._player, true, controller),
                     ],
                   ),
                   StreamBuilder<Duration>(
@@ -220,7 +227,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                           if (controller.loading)
                             Padding(
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 30),
+                              const EdgeInsets.symmetric(horizontal: 30),
                               child: Row(children: [
                                 Text('--:--'),
                                 Spacer(),
@@ -230,7 +237,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                           else
                             Padding(
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 30),
+                              const EdgeInsets.symmetric(horizontal: 30),
                               child: Row(children: [
                                 Text(_toTime(timeElapsed)),
                                 Spacer(),
@@ -326,16 +333,16 @@ class _PlayPauseButtonState extends State<PlayPauseButton> {
         child: child,
         onPressed: !widget.player.loading
             ? () {
-                if (widget.player.playing) {
-                  widget.player.pause();
-                } else {
-                  widget.player.play();
-                }
-              }
+          if (widget.player.playing) {
+            widget.player.pause();
+          } else {
+            widget.player.play();
+          }
+        }
             : null,
         style: TextButton.styleFrom(
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
           primary: Colors.white,
           minimumSize: Size(90, 90),
           backgroundColor: Color(0xFF252223),
@@ -346,49 +353,49 @@ class _PlayPauseButtonState extends State<PlayPauseButton> {
 }
 
 class SeekControl extends TextButton {
-  SeekControl(AudioPlayer player, [bool forward = false])
-      : super(
-          onPressed: () {
-            if (player.playing) {
-              if (forward) {
-                player.seek(player.position + Duration(seconds: 15));
-              } else {
-                player.seek(player.position - Duration(seconds: 15));
-              }
-            }
-          },
-          style: TextButton.styleFrom(
-            primary: Color(0xFF252223),
-            minimumSize: Size(40, 40),
-          ),
-          child: Stack(children: [
-            Icon(
-              forward
-                  ? CupertinoIcons.arrow_clockwise
-                  : CupertinoIcons.arrow_counterclockwise,
-              size: 40,
-            ),
-            Positioned(
-              top: 21,
-              left: 13.5,
-              child: Text('15', style: TextStyle(fontSize: 10)),
-            )
-          ]),
-        );
+  static _resolveAction(PlaylistController controller, bool forward) {
+    if (controller.playing) {
+      if (forward && controller.canPlayNext()) {
+        return () => controller.playNext();
+      } else if (!forward && controller.canPlayPrev()) {
+        return () => controller.playPrev();
+      }
+    }
+    return null;
+  }
+
+  SeekControl(AudioPlayer player, [
+    bool forward = false,
+    PlaylistController controller,
+  ]) : super(
+    onPressed: _resolveAction(controller, forward),
+    style: TextButton.styleFrom(
+      primary: Color(0xFF252223),
+      minimumSize: Size(40, 40),
+    ),
+    child: Icon(
+      forward
+          ? CupertinoIcons.arrow_clockwise
+          : CupertinoIcons.arrow_counterclockwise,
+      size: 40,
+    ),
+  );
 }
 
 class PlaylistController extends ChangeNotifier {
   final List<Module> _songs;
   var _player = AudioPlayer();
+  int _playlistIndex;
 
-  PlaylistController(this._songs, [this.autoplay = false]) {
+  PlaylistController(this._songs, [this.autoplay = false, int index = 0]) {
     _module = _songs[_index];
     _loadModule(_songs[_index]);
+    _playlistIndex = index;
   }
 
   Module _module;
   var _index = 0;
-  var _repeat = false;
+  var _repeat = AppData().autoplay;
   var _loading = true;
   var _playing = false;
 
@@ -415,6 +422,14 @@ class PlaylistController extends ChangeNotifier {
     AppData.user.unRecommend(module);
     if (index < _songs.length - 1) {
       AppData.user.recommend(_songs[index + 1]);
+    } else if (index == _songs.length -1) {
+      if (_playlistIndex == 0) {
+        AppData.user.recommend(AppData.intermediate[0]);
+      } else if (_playlistIndex == 1) {
+        AppData.user.recommend(AppData.advanced[0]);
+      } else {
+        AppData.user.recommend(AppData.beginner[0]);
+      }
     }
 
     _player.setAudioSource(
@@ -477,12 +492,19 @@ class PlaylistController extends ChangeNotifier {
       _loadModule(_songs[_index = index]);
   }
 
+  bool canPlayNext() => index < (_songs.length - 1);
+
+  bool canPlayPrev() => index > 0;
+
   playPrev() {
     if (_index > 0) _loadModule(_songs[--_index]);
   }
 
   playNext() async {
-    if (_index < _songs.length - 1) {
+    print('I AM HERE');
+    print(index);
+    print(index < _songs.length);
+    if (_index < _songs.length) {
       _loadModule(_songs[++_index]);
     } else if (_repeat) {
       _loadModule(_songs[_index = 0]);

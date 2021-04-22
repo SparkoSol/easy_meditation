@@ -1,3 +1,4 @@
+import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/ui/views/colored_background.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,8 @@ class AccountSettingsPage extends StatefulWidget {
 }
 
 class _AccountSettingsPageState extends State<AccountSettingsPage> {
+  final _appData = AppData();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,8 +31,15 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: ListTile(
-                title: Text('Always Repeat Music'),
-                trailing: CupertinoSwitch(value: false, onChanged: (val) {}),
+                title: Text('Auto Loop Mode'),
+                trailing: CupertinoSwitch(
+                  value: _appData.autoplay,
+                  onChanged: (val) {
+                    setState(() {
+                      _appData.autoplay = val;
+                    });
+                  },
+                ),
               ),
             ),
           ]),

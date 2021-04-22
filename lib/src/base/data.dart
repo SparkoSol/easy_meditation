@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppData {
   static User user;
   static c.Card _card;
+  static bool _autoplay;
   static List<String> favorites = [];
   static List<Module> recommended = [];
   static List<String> recommendations;
@@ -85,6 +86,7 @@ class AppData {
 
   static Future<void> initiate() async {
     _preferences = await SharedPreferences.getInstance();
+    _autoplay = _preferences.getBool('autoplay');
     _lastTimeProgress = _preferences.getInt('lastTimeProgress');
     print('Last Time Progress');
     print(_lastTimeProgress);
@@ -151,6 +153,13 @@ class AppData {
       minute: int.parse(parts.last),
     );
   }
+
+  set autoplay(bool value) {
+    _autoplay = value;
+    _preferences.setBool('autoplay', _autoplay);
+  }
+
+  bool get autoplay => _autoplay ?? false;
 
   set reminderTime(TimeOfDay value) {
     if (value == null) return;

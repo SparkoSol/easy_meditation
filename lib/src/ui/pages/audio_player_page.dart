@@ -17,8 +17,9 @@ class AudioPlayerPage extends StatefulWidget {
   final Module module;
   final List<Module> otherModules;
   final int index;
+  final int playingIndex;
 
-  AudioPlayerPage(this.module, [this.otherModules = const [], this.index = 0]);
+  AudioPlayerPage(this.module, [this.otherModules = const [], this.index = 0, this.playingIndex = 0]);
 
   @override
   _AudioPlayerPageState createState() => _AudioPlayerPageState();
@@ -35,7 +36,8 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
     controller = PlaylistController(
       widget.otherModules.isNotEmpty ? widget.otherModules : [widget.module],
       true,
-      widget.index
+      widget.index,
+      widget.playingIndex
     )
       ..addListener(_rebuild);
   }
@@ -387,7 +389,8 @@ class PlaylistController extends ChangeNotifier {
   var _player = AudioPlayer();
   int _playlistIndex;
 
-  PlaylistController(this._songs, [this.autoplay = false, int index = 0]) {
+  PlaylistController(this._songs, [this.autoplay = false, int index = 0, int ind = 0]) {
+    _index = ind;
     _module = _songs[_index];
     _loadModule(_songs[_index]);
     _playlistIndex = index;
@@ -584,17 +587,17 @@ class _UpNextBottomSheetState extends State<UpNextBottomSheet> {
                 opacity: .5,
                 child: ModuleWidget(
                   widget.controller.modules[i],
-                  pressed,
-                  i == widget.controller.index,
-                  false,
+                  onPressed: pressed,
+                  playing: i == widget.controller.index,
+                  openPlayer: false,
                 ),
               );
             } else {
               yield ModuleWidget(
                 widget.controller.modules[i],
-                pressed,
-                i == widget.controller.index,
-                false,
+                onPressed: pressed,
+                playing: i == widget.controller.index,
+                openPlayer: false,
               );
             }
           }

@@ -128,7 +128,8 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                               if (data.isNotEmpty) {
                                 Navigator.of(context)
                                     .push(MaterialPageRoute(builder: (context) {
-                                  return AudioPlayerPage(data[0], data, widget.controller.courseId);
+                                  return AudioPlayerPage(data[0], data,
+                                      widget.controller.courseId);
                                 }));
                               } else {
                                 ModalService.scaffoldMessengerKey.currentState
@@ -224,7 +225,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
             delegate: SliverChildBuilderDelegate(
               (context, index) => ModuleWidget(
                 data[index],
-                () async {
+                onPressed: () async {
                   await _player.pause();
                   playingIndex = null;
                   setState(() {
@@ -234,10 +235,29 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                       AppData.user.recommend(data[index + 1]);
                     AppData().writeFile();
                   });
+
+                  if (data.isNotEmpty) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return AudioPlayerPage(
+                            data[index],
+                            data,
+                            widget.controller.courseId,
+                            index
+                          );
+                        },
+                      ),
+                    );
+                  } else {
+                    ModalService.scaffoldMessengerKey.currentState.showSnackBar(
+                      SnackBar(content: Text('No Modules')),
+                    );
+                  }
                 },
-                index == playingIndex,
-                true,
-                () {
+                playing: index == playingIndex,
+                openPlayer: false,
+                onPlayRequest: () {
                   LazyTaskService.execute(context, () async {
                     AppData.user.unRecommend(data[index]);
 
@@ -291,7 +311,8 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
     if (minutes >= 1) {
       msString = '${twoDigit(minutes)} MINUTES';
     } else {
-      msString = '${twoDigit(value.inSeconds.remainder(Duration.secondsPerMinute))} SECONDS';
+      msString =
+          '${twoDigit(value.inSeconds.remainder(Duration.secondsPerMinute))} SECONDS';
     }
 
     final hours = value.inHours;

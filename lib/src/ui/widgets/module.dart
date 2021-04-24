@@ -12,12 +12,12 @@ class ModuleWidget extends StatefulWidget {
   final VoidCallback onPlayRequest;
 
   ModuleWidget(
-    this.module, [
+    this.module, {
     this.onPressed,
     this.playing = false,
     this.openPlayer = true,
     this.onPlayRequest,
-  ]);
+  });
 
   @override
   _ModuleWidgetState createState() => _ModuleWidgetState();
@@ -57,8 +57,7 @@ class _ModuleWidgetState extends State<ModuleWidget> {
               primary: AppTheme.primaryColor,
               side: BorderSide(color: AppTheme.primaryColor),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30)
-              ),
+                  borderRadius: BorderRadius.circular(30)),
             ),
             // width: 47,
             // height: 47,
@@ -69,7 +68,8 @@ class _ModuleWidgetState extends State<ModuleWidget> {
           ),
           title: Text(widget.module.name),
           subtitle: Text(Module.courses[widget.module.courseNumber]),
-          trailing: Text(_toTimeSec(Duration(seconds: widget.module.length.toInt()))),
+          trailing:
+              Text(_toTimeSec(Duration(seconds: widget.module.length.toInt()))),
         ),
         Container(
           height: 1,

@@ -194,7 +194,6 @@ class _HomeViewState extends State<HomeView> {
                       ]),
                     ),
                   ],
-
                   if (AppData.user.recommended?.isNotEmpty == true) ...[
                     Padding(
                       padding: const EdgeInsets.only(top: 20, bottom: 15),
@@ -206,23 +205,19 @@ class _HomeViewState extends State<HomeView> {
                         ),
                       ),
                     ),
-
                     for (var i = 0; i < AppData.user.recommended.length; ++i)
                       Container(
                         color: Colors.white,
-                        child: ModuleWidget(
-                          AppData.user.recommended[i],
-                          () {
-                            AppData.user.unRecommend(AppData.user.recommended[i]);
+                        child: ModuleWidget(AppData.user.recommended[i],
+                            onPressed: () {
+                          AppData.user.unRecommend(AppData.user.recommended[i]);
 
-                            if (i < AppData.user.recommended.length - 1)
-                              AppData.user.recommend(AppData.user.recommended[i + 1]);
+                          if (i < AppData.user.recommended.length - 1)
+                            AppData.user
+                                .recommend(AppData.user.recommended[i + 1]);
 
-                            setState(() {});
-                          },
-                          false,
-                          true
-                        ),
+                          setState(() {});
+                        }, playing: false, openPlayer: true),
                       ),
                   ]
                 ],

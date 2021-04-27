@@ -13,8 +13,8 @@ class AppData {
   static User user;
   static c.Card _card;
   static bool _autoplay;
+  static Module recommended;
   static List<String> favorites = [];
-  static List<Module> recommended = [];
   static List<String> recommendations;
   static SharedPreferences _preferences;
   static String _filePath;
@@ -35,7 +35,7 @@ class AppData {
     await File(_filePath).writeAsString(jsonEncode({
       'user': user?.toJson() ?? null,
       'favorites': favorites,
-      'recommended': recommended.map((e) => e.toJson()).toList(),
+      'recommended': recommended?.toJson(),
       'beginner': beginner,
       'advanced': advanced,
       'card': _card,
@@ -101,6 +101,10 @@ class AppData {
     final data = jsonDecode(chunk == '' ? '{}' : chunk) as Map;
     if (data.containsKey('user') && data['user'] != null) {
       user = User.fromJson(data['user']);
+    }
+
+    if (data.containsKey('recommended') && data['recommended'] != null && data['recommended'] is Map) {
+      recommended = Module.fromJson(data['recommended']);
     }
 
     if (data.containsKey('favorites')) {

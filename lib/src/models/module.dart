@@ -36,5 +36,4 @@ class Module {
 
   @override
   int get hashCode => super.hashCode;
-
 }

@@ -31,9 +31,13 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
   void recommend(Module song) {
-    if (recommended.contains(song)) return;
+    if (recommended.isEmpty) {
+      recommended.add(song);
+    } else {
+      unRecommend(recommended[0]);
+      recommended.add(song);
+    }
 
-    recommended.add(song);
     http.post(
       Uri.parse('$apiUrl/users/add-recommended'),
       body: {'module': song.id},

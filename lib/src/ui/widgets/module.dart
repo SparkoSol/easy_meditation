@@ -1,3 +1,4 @@
+import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/models/module.dart';
 import 'package:easy_meditation/src/ui/pages/audio_player_page.dart';
@@ -10,6 +11,7 @@ class ModuleWidget extends StatefulWidget {
   final bool openPlayer;
   final VoidCallback onPressed;
   final VoidCallback onPlayRequest;
+  final VoidCallback onPlayerReturn;
 
   ModuleWidget(
     this.module, {
@@ -17,6 +19,7 @@ class ModuleWidget extends StatefulWidget {
     this.playing = false,
     this.openPlayer = true,
     this.onPlayRequest,
+    this.onPlayerReturn,
   });
 
   @override
@@ -43,9 +46,18 @@ class _ModuleWidgetState extends State<ModuleWidget> {
           onTap: () async {
             await widget.onPressed?.call();
             if (widget.openPlayer) {
+              List<Module> allCourses =
+                  AppData.modules(widget.module.courseNumber);
+
               await Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => AudioPlayerPage(widget.module),
+                builder: (context) => AudioPlayerPage(
+                    widget.module,
+                    allCourses,
+                    widget.module.courseNumber,
+                    allCourses.indexOf(widget.module)),
               ));
+
+              widget.onPlayerReturn?.call();
             }
           },
           leading: OutlinedButton(

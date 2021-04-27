@@ -115,85 +115,85 @@ class _HomeViewState extends State<HomeView> {
                       widget._cC.courseId = 2;
                     },
                   ),
-                  if (AppData.recommended.isNotEmpty) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, bottom: 15),
-                      child: Text(
-                        'Recommended for you',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
-                      ),
-                    ),
-                    Column(children: [
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4)),
-                        child: ListTile(
-                          leading: Container(
-                            width: 47,
-                            height: 47,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: AppTheme.primaryColor),
-                            ),
-                            child: Icon(Icons.play_arrow,
-                                color: AppTheme.primaryColor),
-                          ),
-                          title: Text('Module 1'),
-                          subtitle: Text('Advanced Course'),
-                          trailing: Text('10 min'),
-                        ),
-                      ),
-                      Container(
-                        height: 1,
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.white,
-                              Colors.grey.shade600,
-                              Colors.white
-                            ],
-                          ),
-                        ),
-                      ),
-                    ]),
-                    Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4)),
-                      child: Column(children: [
-                        ListTile(
-                          leading: Container(
-                            width: 47,
-                            height: 47,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: AppTheme.primaryColor),
-                            ),
-                            child: Icon(Icons.play_arrow,
-                                color: AppTheme.primaryColor),
-                          ),
-                          title: Text('Module 1'),
-                          subtitle: Text('Advanced Course'),
-                          trailing: Text('10 min'),
-                        ),
-                        Container(
-                          height: 1,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.white,
-                                Colors.grey.shade600,
-                                Colors.white
-                              ],
-                            ),
-                          ),
-                        ),
-                      ]),
-                    ),
-                  ],
+                  // if (AppData.recommended != null) ...[
+                  //   Padding(
+                  //     padding: const EdgeInsets.only(top: 10, bottom: 15),
+                  //     child: Text(
+                  //       'Recommended for you',
+                  //       style: TextStyle(
+                  //           fontWeight: FontWeight.bold, fontSize: 20),
+                  //     ),
+                  //   ),
+                  //   Column(children: [
+                  //     Container(
+                  //       decoration: BoxDecoration(
+                  //           color: Colors.white,
+                  //           borderRadius: BorderRadius.circular(4)),
+                  //       child: ListTile(
+                  //         leading: Container(
+                  //           width: 47,
+                  //           height: 47,
+                  //           decoration: BoxDecoration(
+                  //             shape: BoxShape.circle,
+                  //             border: Border.all(color: AppTheme.primaryColor),
+                  //           ),
+                  //           child: Icon(Icons.play_arrow,
+                  //               color: AppTheme.primaryColor),
+                  //         ),
+                  //         title: Text('Module 1'),
+                  //         subtitle: Text('Advanced Course'),
+                  //         trailing: Text('10 min'),
+                  //       ),
+                  //     ),
+                  //     Container(
+                  //       height: 1,
+                  //       margin: const EdgeInsets.symmetric(horizontal: 10),
+                  //       decoration: BoxDecoration(
+                  //         gradient: LinearGradient(
+                  //           colors: [
+                  //             Colors.white,
+                  //             Colors.grey.shade600,
+                  //             Colors.white
+                  //           ],
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ]),
+                  //   Container(
+                  //     decoration: BoxDecoration(
+                  //         color: Colors.white,
+                  //         borderRadius: BorderRadius.circular(4)),
+                  //     child: Column(children: [
+                  //       ListTile(
+                  //         leading: Container(
+                  //           width: 47,
+                  //           height: 47,
+                  //           decoration: BoxDecoration(
+                  //             shape: BoxShape.circle,
+                  //             border: Border.all(color: AppTheme.primaryColor),
+                  //           ),
+                  //           child: Icon(Icons.play_arrow,
+                  //               color: AppTheme.primaryColor),
+                  //         ),
+                  //         title: Text('Module 1'),
+                  //         subtitle: Text('Advanced Course'),
+                  //         trailing: Text('10 min'),
+                  //       ),
+                  //       Container(
+                  //         height: 1,
+                  //         decoration: BoxDecoration(
+                  //           gradient: LinearGradient(
+                  //             colors: [
+                  //               Colors.white,
+                  //               Colors.grey.shade600,
+                  //               Colors.white
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ]),
+                  //   ),
+                  // ],
                   if (AppData.user.recommended?.isNotEmpty == true) ...[
                     Padding(
                       padding: const EdgeInsets.only(top: 20, bottom: 15),
@@ -205,20 +205,16 @@ class _HomeViewState extends State<HomeView> {
                         ),
                       ),
                     ),
-                    for (var i = 0; i < AppData.user.recommended.length; ++i)
-                      Container(
-                        color: Colors.white,
-                        child: ModuleWidget(AppData.user.recommended[i],
-                            onPressed: () {
-                          AppData.user.unRecommend(AppData.user.recommended[i]);
-
-                          if (i < AppData.user.recommended.length - 1)
-                            AppData.user
-                                .recommend(AppData.user.recommended[i + 1]);
-
-                          setState(() {});
-                        }, playing: false, openPlayer: true),
+                    Container(
+                      color: Colors.white,
+                      child: ModuleWidget(
+                        AppData.user.recommended[0],
+                        playing: false,
+                        openPlayer: true,
+                        onPlayerReturn: () => setState(() {}),
                       ),
+                    ),
+                    // for (var i = 0; i < AppData.user.recommended.length; ++i)
                   ]
                 ],
               ),

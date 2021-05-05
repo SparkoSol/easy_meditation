@@ -1,4 +1,5 @@
 import 'package:easy_meditation/src/base/data.dart';
+import 'package:easy_meditation/src/base/locale.dart';
 import 'package:easy_meditation/src/ui/pages/course_detail.dart';
 import 'package:easy_meditation/src/ui/widgets/module.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +21,11 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
+    final lang = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: AppTheme.primaryColor,
-      appBar: CupertinoNavigationBar(middle: Text('Home')),
+      appBar: CupertinoNavigationBar(middle: Text(lang.home)),
       body: Column(children: [
         Container(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
@@ -43,23 +46,13 @@ class _HomeViewState extends State<HomeView> {
                 SizedBox(width: 15),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 5),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Welcome, ${AppData.user.name}',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Live happier with us',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ],
+                  child: Text(
+                    '${lang.welcome}, ${AppData.user.name}',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -198,7 +191,7 @@ class _HomeViewState extends State<HomeView> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20, bottom: 15),
                       child: Text(
-                        'Recommended for You',
+                        lang.recommendedForYou,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

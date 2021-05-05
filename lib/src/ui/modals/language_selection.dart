@@ -1,4 +1,6 @@
 import 'package:easy_meditation/src/base/assets.dart';
+import 'package:easy_meditation/src/base/config.dart';
+import 'package:easy_meditation/src/base/locale.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -8,10 +10,12 @@ class LanguageSelection extends StatefulWidget {
 }
 
 class _LanguageSelectionState extends State<LanguageSelection> {
-  var lang = 'en';
+  final config = AppConfig();
 
   @override
   Widget build(BuildContext context) {
+    final lang = AppLocalizations.of(context);
+
     return Dialog(
       insetPadding: const EdgeInsets.all(20),
       child: Padding(
@@ -19,27 +23,20 @@ class _LanguageSelectionState extends State<LanguageSelection> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Language', style: AppTheme.sectionHeaderStyle),
+            Text(lang.language, style: AppTheme.sectionHeaderStyle),
             SizedBox(height: 25),
             LanguageTile(
               name: 'English - USA',
-              selected: lang == 'en',
               image: Assets.englishImage,
-              onPressed: () => setState(() => lang = 'en'),
+              selected: config.locale.languageCode == 'en',
+              onPressed: () => config.locale = const Locale('en'),
             ),
             Divider(),
             LanguageTile(
-              name: 'Hindi - India',
-              selected: lang == 'in',
-              image: Assets.indiaImage,
-              onPressed: () => setState(() => lang = 'in'),
-            ),
-            Divider(),
-            LanguageTile(
-              name: 'French - France',
-              selected: lang == 'fr',
-              image: Assets.frenchImage,
-              onPressed: () => setState(() => lang = 'fr'),
+              name: 'Chinese - China',
+              image: 'assets/icons/flag-400.png',
+              selected: config.locale.languageCode == 'zh',
+              onPressed: () => config.locale = const Locale('zh'),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 20),
@@ -49,18 +46,18 @@ class _LanguageSelectionState extends State<LanguageSelection> {
                   onTap: Navigator.of(context).pop,
                 ),
                 Spacer(),
-                TextButton(
-                  onPressed: Navigator.of(context).pop,
-                  child: Text('Save'),
-                  style: TextButton.styleFrom(
-                    primary: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 13,
-                    ),
-                    backgroundColor: AppTheme.darkBlueColor,
-                  ),
-                ),
+                // TextButton(
+                //   onPressed: Navigator.of(context).pop,
+                //   child: Text('Save'),
+                //   style: TextButton.styleFrom(
+                //     primary: Colors.white,
+                //     padding: const EdgeInsets.symmetric(
+                //       horizontal: 30,
+                //       vertical: 13,
+                //     ),
+                //     backgroundColor: AppTheme.darkBlueColor,
+                //   ),
+                // ),
               ]),
             )
           ],

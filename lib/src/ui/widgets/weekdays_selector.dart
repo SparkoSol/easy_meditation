@@ -1,24 +1,35 @@
+import 'package:easy_meditation/src/base/locale.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:flutter/material.dart';
 
 class WeekdaysSelector extends StatefulWidget {
   final List<bool> selection;
+  final AppLocalizations lang;
   final ValueChanged<List<bool>> onChanged;
 
-  WeekdaysSelector(this.selection, this.onChanged);
+  WeekdaysSelector(this.selection, this.lang, this.onChanged);
 
   @override
   _WeekdaysSelectorState createState() => _WeekdaysSelectorState();
 }
 
 class _WeekdaysSelectorState extends State<WeekdaysSelector> {
-  static const weekdays = ['M', 'T', 'W', 'TH', 'F', 'S', 'SU'];
-
+  List<String> weekdays;
   List<bool> selection;
 
   @override
   void initState() {
     super.initState();
+
+    weekdays = [
+      widget.lang.monday,
+      widget.lang.tuesday,
+      widget.lang.wednesday,
+      widget.lang.thursday,
+      widget.lang.friday,
+      widget.lang.saturday,
+      widget.lang.sunday,
+    ];
     selection = widget.selection;
   }
 

@@ -135,7 +135,7 @@ class _ReminderManagementPageState extends State<ReminderManagementPage> {
                           // ),
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
-                            child: WeekdaysSelector(weekdays, (value) {
+                            child: WeekdaysSelector(weekdays, lang, (value) {
                               _setupReminderNotifications();
                             }),
                           ),

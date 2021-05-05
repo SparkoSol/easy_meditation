@@ -1,3 +1,4 @@
+import 'package:easy_meditation/src/base/locale.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'module.g.dart';
@@ -17,7 +18,9 @@ class Module {
   int favorites = 0;
   int listened = 0;
 
-  static const courses = ['Beginner', 'Intermediate', 'Advanced'];
+  static List<String> getCourses(AppLocalizations lang) => [
+    lang.beginner, lang.intermediate, lang.advanced
+  ];
 
 
   Module();

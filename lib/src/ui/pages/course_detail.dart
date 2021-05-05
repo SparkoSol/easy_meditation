@@ -1,4 +1,5 @@
 import 'package:easy_meditation/src/base/data.dart';
+import 'package:easy_meditation/src/base/locale.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/models/module.dart';
 import 'package:easy_meditation/src/service/rest/_client.dart';
@@ -82,10 +83,12 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
     }
 
     final data = AppData.modules(widget.controller.courseId);
+    final lang = AppLocalizations.of(context);
+    final modules = Module.getCourses(lang);
 
     return Scaffold(
       appBar: CupertinoNavigationBar(
-        middle: Text(Module.courses[widget.controller.courseId]),
+        middle: Text(modules[widget.controller.courseId]),
       ),
       body: ColoredBackground(
         child: CustomScrollView(slivers: [
@@ -108,7 +111,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${Module.courses[widget.controller.courseId]} Course',
+                        '${modules[widget.controller.courseId]} ${lang.course}',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -117,7 +120,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                       ),
                       SizedBox(height: 5),
                       Text(
-                        '${data.length} Modules',
+                        '${data.length} ${lang.modules}',
                         style: TextStyle(color: Colors.grey.shade500),
                       ),
                       Spacer(),
@@ -152,8 +155,11 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                             onPressed: () {},
                             label: Expanded(
                               child: Text(
-                                _toTime(data.fold(
-                                    0, (p, e) => (p + e.length).toInt())),
+                                _toTime(
+                                  data.fold(
+                                      0, (p, e) => (p + e.length).toInt()),
+                                  lang,
+                                ),
                                 style: TextStyle(
                                   fontWeight: FontWeight.normal,
                                   fontSize: 10,
@@ -193,7 +199,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 5),
                       child: Text(
-                          '${data.fold(0, (pv, e) => pv + e.favorites)} Favorites'),
+                          '${data.fold(0, (pv, e) => pv + e.favorites)} ${lang.favourites}'),
                     ),
                   ]),
                 ),
@@ -206,7 +212,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 5),
                       child: Text(
-                          '${data.fold(0, (pv, e) => pv + e.listened)} Listened'),
+                          '${data.fold(0, (pv, e) => pv + e.listened)} ${lang.listened}'),
                     ),
                   ]),
                 )
@@ -240,12 +246,8 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) {
-                          return AudioPlayerPage(
-                            data[index],
-                            data,
-                            widget.controller.courseId,
-                            index
-                          );
+                          return AudioPlayerPage(data[index], data,
+                              widget.controller.courseId, index);
                         },
                       ),
                     );
@@ -298,7 +300,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
     );
   }
 
-  String _toTime(int val) {
+  String _toTime(int val, AppLocalizations lang) {
     final value = Duration(seconds: val);
 
     twoDigit(int value) {
@@ -309,7 +311,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
     String msString;
     final minutes = value.inMinutes.remainder(Duration.minutesPerHour);
     if (minutes >= 1) {
-      msString = '${twoDigit(minutes)} MINUTES';
+      msString = '${twoDigit(minutes)} ${lang.minutes}';
     } else {
       msString =
           '${twoDigit(value.inSeconds.remainder(Duration.secondsPerMinute))} SECONDS';

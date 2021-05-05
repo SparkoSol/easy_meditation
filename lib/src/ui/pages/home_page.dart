@@ -1,4 +1,5 @@
 import 'package:easy_meditation/src/base/data.dart';
+import 'package:easy_meditation/src/base/locale.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:easy_meditation/src/base/theme.dart';
@@ -32,6 +33,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = AppLocalizations.of(context);
+
     return Scaffold(
       extendBody: true,
       body: PageView(
@@ -54,17 +57,17 @@ class _HomePageState extends State<HomePage> {
         selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
         items: [
           _bottomNavBarItem(
-            label: 'Home',
+            label: lang.home,
             image: Assets.homeIcon,
             focused: _selectedIndex == 0,
           ),
           _bottomNavBarItem(
-            label: 'Meditate',
+            label: lang.meditate,
             image: Assets.lotusIcon,
             focused: _selectedIndex == 1,
           ),
           _bottomNavBarItem(
-            label: 'Profile',
+            label: lang.profile,
             image: Assets.profileIcon,
             focused: _selectedIndex == 2,
           ),

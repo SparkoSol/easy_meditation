@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:easy_meditation/src/base/locale.dart';
 import 'package:http/http.dart' as http;
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/models/module.dart';
@@ -46,7 +47,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = AppLocalizations.of(context);
     final isFav = AppData.favorites.contains(module.id);
+    final modules = Module.getCourses(lang);
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -64,7 +67,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
         ),
         backgroundColor: Colors.transparent,
         padding: EdgeInsetsDirectional.zero,
-        middle: Text(Module.courses[module.courseNumber]),
+        middle: Text(modules[module.courseNumber]),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -183,7 +186,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 70),
                     child: Text(
-                      '${Module.courses[module.courseNumber]} level',
+                      '${modules[module.courseNumber]} level',
                     ),
                   ),
                   Row(

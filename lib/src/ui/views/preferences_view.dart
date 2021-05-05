@@ -1,4 +1,5 @@
 import 'package:easy_meditation/src/base/data.dart';
+import 'package:easy_meditation/src/base/locale.dart';
 import 'package:easy_meditation/src/base/pages.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/service/ui/lazy_task_service.dart';
@@ -20,10 +21,8 @@ class _PreferencesViewState extends State<PreferencesView> {
   @override
   Widget build(BuildContext context) {
     final transaction = AppData().transaction;
+    final lang = AppLocalizations.of(context);
     final difference = transaction.nextAt.difference(DateTime.now());
-
-    print(transaction.nextAt);
-    print(DateTime.now());
 
     String timeLeft;
     // if (difference.inDays > 30) {
@@ -44,7 +43,7 @@ class _PreferencesViewState extends State<PreferencesView> {
 
     return ColoredBackground(
       child: CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(middle: Text('Account')),
+        navigationBar: CupertinoNavigationBar(middle: Text(lang.account)),
         child: Container(
           constraints: BoxConstraints.expand(),
           decoration: BoxDecoration(
@@ -93,7 +92,7 @@ class _PreferencesViewState extends State<PreferencesView> {
                     children: [
                       if (transaction.amount == 0) ...[
                         Text(
-                          'Trial Access',
+                          lang.trialAccess,
                           style: TextStyle(
                             fontSize: 16,
                             color: textColor,
@@ -107,7 +106,7 @@ class _PreferencesViewState extends State<PreferencesView> {
                         ),
                       ] else ...[
                         Text(
-                          'Trial Access',
+                          lang.trialAccess,
                           style: TextStyle(
                             fontSize: 16,
                             color: Color(0xFF00AC06),
@@ -142,7 +141,7 @@ class _PreferencesViewState extends State<PreferencesView> {
                             children: [
                               Icon(CupertinoIcons.capslock, size: 17),
                               SizedBox(width: 20),
-                              Text('Upgrade')
+                              Text(lang.upgrade)
                             ],
                           ),
                           style: TextButton.styleFrom(
@@ -164,7 +163,7 @@ class _PreferencesViewState extends State<PreferencesView> {
                   child: Text('Other', style: AppTheme.sectionHeaderStyle),
                 ),
                 PreferenceTile(
-                    title: 'Account Settings',
+                    title: '${lang.account} ${lang.settings}',
                     onPressed: () {
                       Navigator.of(context)
                           .push(MaterialPageRoute(builder: (context) {
@@ -174,13 +173,13 @@ class _PreferencesViewState extends State<PreferencesView> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: PreferenceTile(
-                    title: 'Notification Settings',
+                    title: '${lang.notifications} ${lang.settings}',
                     onPressed: () => NavigationService.toPage(
                         context, AppPages.notificationsSettings),
                   ),
                 ),
                 PreferenceTile(
-                    title: 'Language',
+                    title: lang.language,
                     onPressed: () {
                       showDialog(
                           context: context,
@@ -191,16 +190,16 @@ class _PreferencesViewState extends State<PreferencesView> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: PreferenceTile(
-                    title: 'About Application',
+                    title: lang.aboutApplication,
                     onPressed: () =>
                         NavigationService.toPage(context, AppPages.about),
                   ),
                 ),
-                PreferenceTile(title: 'Contact Us', onPressed: () {}),
+                PreferenceTile(title: lang.contactUs, onPressed: () {}),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: PreferenceTile(
-                    title: 'Logout',
+                    title: lang.logOut,
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.red,

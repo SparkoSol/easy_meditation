@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:easy_meditation/src/base/data.dart';
+import 'package:easy_meditation/src/base/locale.dart';
 import 'package:easy_meditation/src/base/pages.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/models/register_request.dart';

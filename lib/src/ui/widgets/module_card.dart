@@ -1,4 +1,5 @@
 import 'package:easy_meditation/src/base/data.dart';
+import 'package:easy_meditation/src/base/locale.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/models/module.dart';
 import 'package:easy_meditation/src/service/rest/modules_rest.dart';
@@ -17,6 +18,8 @@ class ModuleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = AppLocalizations.of(context);
+
     Color color;
     dynamic child;
     var isAllowed =
@@ -70,7 +73,7 @@ class ModuleCard extends StatelessWidget {
                     children: [
                       SizedBox(height: 20),
                       Text(
-                        'Advanced',
+                        lang.advanced,
                         style: TextStyle(
                           fontSize: 17,
                           color: Colors.white,
@@ -133,6 +136,7 @@ class ModuleCard extends StatelessWidget {
             ),
           );
     } else {
+      final modules = Module.getCourses(lang);
       child = (data) => Container(
             height: 190,
             padding: const EdgeInsets.all(10),
@@ -188,7 +192,7 @@ class ModuleCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      Module.courses[index],
+                      modules[index],
                       style: TextStyle(
                         fontSize: 17,
                         color: Colors.white,

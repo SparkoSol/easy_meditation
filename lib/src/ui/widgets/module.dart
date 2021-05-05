@@ -1,4 +1,5 @@
 import 'package:easy_meditation/src/base/data.dart';
+import 'package:easy_meditation/src/base/locale.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/models/module.dart';
 import 'package:easy_meditation/src/ui/pages/audio_player_page.dart';
@@ -30,6 +31,7 @@ class _ModuleWidgetState extends State<ModuleWidget> {
   @override
   Widget build(BuildContext context) {
     Widget icon;
+
     if (widget.playing) {
       icon = Transform.rotate(
         angle: -1.5708,
@@ -38,6 +40,8 @@ class _ModuleWidgetState extends State<ModuleWidget> {
     } else {
       icon = Icon(Icons.play_arrow, color: AppTheme.primaryColor);
     }
+
+    final modules = Module.getCourses(AppLocalizations.of(context));
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -79,7 +83,7 @@ class _ModuleWidgetState extends State<ModuleWidget> {
             // ),
           ),
           title: Text(widget.module.name),
-          subtitle: Text(Module.courses[widget.module.courseNumber]),
+          subtitle: Text(modules[widget.module.courseNumber]),
           trailing:
               Text(_toTimeSec(Duration(seconds: widget.module.length.toInt()))),
         ),

@@ -78,5 +78,8 @@
   "saturday": "S",
   "@saturday": {},
   "sunday": "SU",
-  "@sunday": {}
+  "@sunday": {},
+
+  "next": "Next",
+  "skip": "Skip"
 }

@@ -39,7 +39,7 @@ class _ReminderManagementPageState extends State<ReminderManagementPage> {
     return LocalizedView(
       builder: (context, lang) => Scaffold(
         appBar: CupertinoNavigationBar(
-          middle: Text(lang.notificationsTitle),
+          middle: Text(lang.notifications),
           backgroundColor: Colors.transparent,
         ),
         extendBodyBehindAppBar: true,
@@ -52,7 +52,7 @@ class _ReminderManagementPageState extends State<ReminderManagementPage> {
                 children: [
                   Row(children: [
                     Text(
-                      lang.notificationsReminder,
+                      lang.turnOnReminder,
                       style: TextStyle(fontSize: 16),
                     ),
                     Spacer(),
@@ -75,21 +75,21 @@ class _ReminderManagementPageState extends State<ReminderManagementPage> {
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: Text(
-                              lang.notificationsTimeHeader,
+                              lang.meditateTime,
                               style: TextStyle(
                                 fontSize: 25,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
-                          Text(
-                            lang.notificationsTimeDetail,
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                          // Text(
+                          //   lang.notificationsTimeDetail,
+                          //   style: TextStyle(
+                          //     fontSize: 15,
+                          //     color: Colors.grey,
+                          //     fontWeight: FontWeight.w500,
+                          //   ),
+                          // ),
                           Padding(
                             padding: const EdgeInsets.only(top: 20, bottom: 40),
                             child: TextFormField(
@@ -112,27 +112,27 @@ class _ReminderManagementPageState extends State<ReminderManagementPage> {
                                 }
                               },
                               decoration: InputDecoration(
-                                hintText: lang.notificationsChooseTime,
+                                hintText: lang.chooseTime,
                                 suffixIcon: Icon(Icons.access_time_rounded),
                               ),
                             ),
                           ),
                           Text(
-                            lang.notificationsDayHeader,
+                            lang.meditateDay,
                             style: TextStyle(
                               fontSize: 25,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 10),
-                          Text(
-                            lang.notificationsDayDetail,
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                          // SizedBox(height: 10),
+                          // Text(
+                          //   lang.meditateDay,
+                          //   style: TextStyle(
+                          //     fontSize: 15,
+                          //     color: Colors.grey,
+                          //     fontWeight: FontWeight.w500,
+                          //   ),
+                          // ),
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
                             child: WeekdaysSelector(weekdays, (value) {

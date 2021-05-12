@@ -15,6 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:easy_meditation/src/models/register_request.dart' as r;
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class SocialLoginService {
   static Future<void> facebookAuth(void Function(User) onComplete,
@@ -23,11 +24,11 @@ class SocialLoginService {
 
     try {
       onComplete((await FirebaseAuth.instance.signInWithCredential(
-              FacebookAuthProvider.credential(token.token)))
+              FacebookAuthProvider.credential(token.accessToken.token)))
           .user);
     } on FirebaseException catch (e) {
       throw e.message;
-    } on FacebookAuthException catch (e) {
+    } catch (e) {
       switch (e.errorCode) {
         case FacebookAuthErrorCode.OPERATION_IN_PROGRESS:
           print("You have a previous login operation in progress");
@@ -57,6 +58,22 @@ class SocialLoginService {
 
     onComplete(
         (await FirebaseAuth.instance.signInWithCredential(credential)).user);
+  }
+
+
+  static appleAuth(void Function(User) onComplete ) async {
+    final appleIdCredential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+    );
+    final oAuthProvider = OAuthProvider('apple.com');
+    final credential = oAuthProvider.credential(
+      idToken: appleIdCredential.identityToken,
+      accessToken: appleIdCredential.authorizationCode,
+    );
+    onComplete((await FirebaseAuth.instance.signInWithCredential(credential)).user);
   }
 
   static signInOrRegister(BuildContext context, User result) async {

@@ -78,5 +78,7 @@
   "saturday": "六",
   "@saturday": {},
   "sunday": "天",
-  "@sunday": {}
+  "@sunday": {},
+   "next": "下一个",
+   "skip": "跳过"
 }

@@ -45,7 +45,7 @@ class _ReminderManagementPageState extends State<ReminderManagementPage> {
         extendBodyBehindAppBar: true,
         body: ColoredBackground(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 80, 20, 0),
+            padding: const EdgeInsets.fromLTRB(20, 90, 20, 0),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

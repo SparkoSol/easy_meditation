@@ -196,13 +196,24 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   if (Platform.isIOS)
-                    Container(
-                      width: 55,
-                      height: 55,
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        shape: BoxShape.circle,
+                    GestureDetector(
+                      onTap: () async {
+                        await SocialLoginService.appleAuth((result) {
+                          FocusScope.of(context).unfocus();
+                          SocialLoginService.signInOrRegister(context, result);
+                        });
+                      },
+                      child: Container(
+                        width: 55,
+                        height: 55,
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: AssetImage(Assets.appleIcon),
+                          ),
+                        ),
                       ),
                     ),
                 ],

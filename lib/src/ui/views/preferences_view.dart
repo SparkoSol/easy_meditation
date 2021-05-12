@@ -59,7 +59,7 @@ class _PreferencesViewState extends State<PreferencesView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                  padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
                   child: Row(children: [
                     Text(AppData.user.name ?? 'Not Signed in'),
                     Spacer(),

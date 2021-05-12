@@ -13,6 +13,7 @@ class NotificationsService {
     await _plugin.initialize(
       InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        iOS: IOSInitializationSettings()
       ),
       onSelectNotification: (d) async => print('notification selected: $d'),
     );

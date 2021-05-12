@@ -30,16 +30,17 @@ dependencies:
   json_annotation: ^3.1.1
   just_audio: ^0.7.1
   shared_preferences: ^2.0.5
-  flutter_local_notifications: 5.0.0-nullsafety.1
+  flutter_local_notifications: 5.0.0+4
   firebase_core: ^1.0.1
   firebase_auth: ^1.0.1
   flutter_facebook_auth:
   google_sign_in:
-  adobe_xd:
-  shimmer: ^1.1.2
+#  adobe_xd:
+#  shimmer: ^1.1.2
   stripe_payment:
-  connectivity_plus: ^1.0.0
+#  connectivity_plus: ^1.0.0
   flutter_launcher_icons: ^0.9.0
+  sign_in_with_apple:
 
 
   # The following adds the Cupertino Icons font to your application.

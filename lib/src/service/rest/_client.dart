@@ -1,5 +1,5 @@
-const apiUrl = 'http://3.17.75.180:4000';
-// 'http://192.168.1.8:4000';
+const apiUrl = 'http://192.168.10.7:4000';
+//const apiUrl = 'http://3.17.75.180:4000';
 // import 'package:dio/dio.dart';
 // import 'package:easy_meditation/src/base/data.dart';
 // import 'package:flutter/foundation.dart';

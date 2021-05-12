@@ -83,10 +83,16 @@ class SignInPage extends StatelessWidget {
                     FocusScope.of(context).unfocus();
 
                     await LazyTaskService.execute(context, () async {
-                      var response = await http.post(
-                          Uri.parse('$apiUrl/auth/sign-in'),
-                          body: jsonEncode(request.toJson()),
-                          headers: {'content-type': 'application/json'});
+                      var response;
+                        print(apiUrl);
+                        response = await http.post(
+                            Uri.parse('$apiUrl/auth/sign-in'),
+                            body: jsonEncode(request.toJson()),
+                            headers: {'content-type': 'application/json'});
+                        print("2 sdasdasd");
+
+
+                      print(response.body);
 
                       if (response.statusCode == 401) {
                         print('here');
@@ -213,13 +219,24 @@ class SignInPage extends StatelessWidget {
                     ),
                   ),
                   if (Platform.isIOS)
-                    Container(
-                      width: 55,
-                      height: 55,
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        shape: BoxShape.circle,
+                    GestureDetector(
+                      onTap: () async {
+                        await SocialLoginService.appleAuth((result) {
+                          FocusScope.of(context).unfocus();
+                          SocialLoginService.signInOrRegister(context, result);
+                        });
+                      },
+                      child: Container(
+                        width: 55,
+                        height: 55,
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: AssetImage(Assets.appleIcon),
+                          ),
+                        ),
                       ),
                     ),
                 ],

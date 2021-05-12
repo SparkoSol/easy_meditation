@@ -127,8 +127,13 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                       Row(children: [
                         Expanded(
                           child: TextButton.icon(
-                            onPressed: () {
+                            onPressed: () async {
                               if (data.isNotEmpty) {
+                                if (_player.playing) {
+                                  await _player.stop();
+                                  playingIndex = null;
+                                  setState(() {});
+                                }
                                 Navigator.of(context)
                                     .push(MaterialPageRoute(builder: (context) {
                                   return AudioPlayerPage(data[0], data,

@@ -430,11 +430,17 @@ class PlaylistController extends ChangeNotifier {
       AppData.user.recommend(_songs[index + 1]);
     } else if (index == _songs.length -1) {
       if (_playlistIndex == 0) {
-        AppData.user.recommend(AppData.intermediate[0]);
+        if (AppData.intermediate.isNotEmpty) {
+          AppData.user.recommend(AppData.intermediate[0]);
+        }
       } else if (_playlistIndex == 1) {
-        AppData.user.recommend(AppData.advanced[0]);
+        if (AppData.advanced.isNotEmpty) {
+          AppData.user.recommend(AppData.advanced[0]);
+        }
       } else {
-        AppData.user.recommend(AppData.beginner[0]);
+        if (AppData.beginner.isNotEmpty) {
+          AppData.user.recommend(AppData.beginner[0]);
+        }
       }
     }
 

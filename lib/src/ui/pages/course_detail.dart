@@ -1,3 +1,6 @@
+import 'dart:async';
+
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/base/locale.dart';
 import 'package:easy_meditation/src/base/theme.dart';
@@ -10,7 +13,7 @@ import 'package:easy_meditation/src/ui/views/colored_background.dart';
 import 'package:easy_meditation/src/ui/widgets/module.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:flutter_exoplayer/audioplayer.dart';
 
 class CourseDetailPageController extends ChangeNotifier {
   CourseDetailPageController();
@@ -129,7 +132,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                           child: TextButton.icon(
                             onPressed: () async {
                               if (data.isNotEmpty) {
-                                if (_player.playing) {
+                                if (_player.playerState == PlayerState.PLAYING) {
                                   await _player.stop();
                                   playingIndex = null;
                                   setState(() {});
@@ -270,28 +273,27 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
 
                     if (index < data.length - 1)
                       AppData.user.recommend(data[index + 1]);
-                    if (_player.playing && index == playingIndex) {
+                    if (_player.playerState == PlayerState.PLAYING &&
+                        index == playingIndex) {
                       await _player.pause();
                       playingIndex = null;
                       setState(() {});
                     } else {
                       await _player.pause();
-                      await _player.setAudioSource(
-                        LockCachingAudioSource(Uri.parse(
-                          '$apiUrl/courses/modules/' + data[index].id,
-                        )),
-                      );
-
-                      _player.positionStream.listen((event) {
-                        if (_player.duration == null) return;
-                        if ((_player.duration - event).inSeconds == 0) {
-                          playingIndex = null;
-                          setState(() {});
-                        }
-                      });
-
-                      setState(() => playingIndex = index);
-                      _player.play();
+                      // await _player.setUrl(
+                      //   Uri.parse(
+                      //     '$apiUrl/courses/modules/' + data[index].id,
+                      //   ).toString(),
+                      // );
+                      // await _player.seek(Duration(milliseconds: 0));
+                      // _player.onPlayerCompletion.listen((event) {
+                      //   playingIndex = null;
+                      //   setState(() {});
+                      // });
+                      //
+                      // setState(() => playingIndex = index);
+                      // // _player.on;
+                      // await _player.resume();
                     }
                   });
                 },

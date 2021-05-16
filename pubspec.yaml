@@ -28,7 +28,8 @@ dependencies:
   intl: any
   http:
   json_annotation: ^3.1.1
-  just_audio: ^0.7.1
+  flutter_exoplayer: ^0.6.1
+#  just_audio: ^0.7.1
   shared_preferences: ^2.0.5
   flutter_local_notifications: 5.0.0+4
   firebase_core: ^1.0.1
@@ -38,8 +39,9 @@ dependencies:
 #  adobe_xd:
 #  shimmer: ^1.1.2
   stripe_payment:
+  path_provider:
 #  connectivity_plus: ^1.0.0
-  flutter_launcher_icons: ^0.9.0
+  flutter_launcher_icons:
   sign_in_with_apple:
 
 

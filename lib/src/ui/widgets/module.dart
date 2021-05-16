@@ -4,7 +4,6 @@ import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/models/module.dart';
 import 'package:easy_meditation/src/ui/pages/audio_player_page.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
 
 class ModuleWidget extends StatefulWidget {
   final bool playing;

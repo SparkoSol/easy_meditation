@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:easy_meditation/src/base/config.dart';
 import 'package:easy_meditation/src/base/locale.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_exoplayer/audioplayer.dart';
 import 'package:http/http.dart' as http;
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/models/module.dart';
@@ -12,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/ui/views/imaged_view.dart';
-import 'package:just_audio/just_audio.dart';
 
 class AudioPlayerPage extends StatefulWidget {
   final Module module;
@@ -20,7 +22,8 @@ class AudioPlayerPage extends StatefulWidget {
   final int index;
   final int playingIndex;
 
-  AudioPlayerPage(this.module, [this.otherModules = const [], this.index = 0, this.playingIndex = 0]);
+  AudioPlayerPage(this.module,
+      [this.otherModules = const [], this.index = 0, this.playingIndex = 0]);
 
   @override
   _AudioPlayerPageState createState() => _AudioPlayerPageState();
@@ -35,11 +38,14 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
   void initState() {
     super.initState();
     controller = PlaylistController(
-      widget.otherModules.isNotEmpty ? widget.otherModules : [widget.module],
-      true,
-      widget.index,
-      widget.playingIndex
-    )
+        songs: widget.otherModules.isNotEmpty
+            ? widget.otherModules
+            : [widget.module],
+        currentIndex: widget.playingIndex
+        // true,
+        // widget.index,
+        // widget.playingIndex
+        )
       ..addListener(_rebuild);
   }
 
@@ -61,9 +67,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
             size: 30,
             color: AppTheme.darkBlueColor,
           ),
-          onPressed: Navigator
-              .of(context)
-              .pop,
+          onPressed: Navigator.of(context).pop,
         ),
         backgroundColor: Colors.transparent,
         padding: EdgeInsetsDirectional.zero,
@@ -78,11 +82,10 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                 onPressed: () async {
                   showDialog(
                     context: context,
-                    builder: (context) =>
-                        AlertDialog(
-                          title: Text('Description'),
-                          content: Text(module.description),
-                        ),
+                    builder: (context) => AlertDialog(
+                      title: Text('Description'),
+                      content: Text(module.description),
+                    ),
                   );
                 },
                 style: TextButton.styleFrom(
@@ -109,8 +112,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                       module.favorites--;
                       http.delete(
                           Uri.parse(
-                              '$apiUrl/courses/modules/${module
-                                  .id}/unmark-fav'),
+                              '$apiUrl/courses/modules/${module.id}/unmark-fav'),
                           body: jsonEncode({"userId": AppData.user.id}));
                       AppData.favorites.remove(module.id);
                     } else {
@@ -198,20 +200,20 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                     ],
                   ),
                   StreamBuilder<Duration>(
-                    stream: controller.progress,
+                    stream: controller._player.onAudioPositionChanged,
                     builder: (context, snapshot) {
                       var progress = 0.0;
 
                       Duration timeLeft;
                       Duration timeElapsed;
-                      if (snapshot.data != null &&
-                          !controller.loading &&
-                          controller.currentDuration != null) {
-                        progress = snapshot.data.inSeconds /
-                            controller.currentDuration.inSeconds;
+                      Duration currentDuration =
+                          Duration(seconds: controller.module.length.toInt());
+                      if (snapshot.data != null && currentDuration != null) {
+                        progress =
+                            snapshot.data.inSeconds / currentDuration.inSeconds;
 
                         timeElapsed = snapshot.data;
-                        timeLeft = controller.currentDuration - timeElapsed;
+                        timeLeft = currentDuration - timeElapsed;
                       }
 
                       if (progress == 1) {
@@ -225,14 +227,13 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                             activeColor: Color(0xFF252223),
                             inactiveColor: Color(0x11252223),
                             onChanged: (double value) {
-                              controller
-                                  .seekTo(controller.currentDuration * value);
+                              controller.seekTo(currentDuration * value);
                             },
                           ),
-                          if (controller.loading)
+                          if (currentDuration == null)
                             Padding(
                               padding:
-                              const EdgeInsets.symmetric(horizontal: 30),
+                                  const EdgeInsets.symmetric(horizontal: 30),
                               child: Row(children: [
                                 Text('--:--'),
                                 Spacer(),
@@ -242,7 +243,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                           else
                             Padding(
                               padding:
-                              const EdgeInsets.symmetric(horizontal: 30),
+                                  const EdgeInsets.symmetric(horizontal: 30),
                               child: Row(children: [
                                 Text(_toTime(timeElapsed)),
                                 Spacer(),
@@ -299,7 +300,16 @@ class PlayPauseButton extends StatefulWidget {
 }
 
 class _PlayPauseButtonState extends State<PlayPauseButton> {
-  void _rebuild() => setState(() {});
+  void _rebuild() async {
+    if (!mounted) return;
+
+    if (SchedulerBinding.instance.schedulerPhase != SchedulerPhase.idle) {
+      await SchedulerBinding.instance.endOfFrame;
+      if (!mounted) return;
+    }
+
+    setState(() {});
+  }
 
   @override
   void initState() {
@@ -309,14 +319,12 @@ class _PlayPauseButtonState extends State<PlayPauseButton> {
 
   @override
   void dispose() {
-    super.dispose();
     widget.player.removeListener(_rebuild);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('Playing: ${widget.player.playing}');
-
     Widget child;
     if (widget.player.loading) {
       child = CircularProgressIndicator(
@@ -338,16 +346,16 @@ class _PlayPauseButtonState extends State<PlayPauseButton> {
         child: child,
         onPressed: !widget.player.loading
             ? () {
-          if (widget.player.playing) {
-            widget.player.pause();
-          } else {
-            widget.player.play();
-          }
-        }
+                if (widget.player.playing) {
+                  widget.player.pause();
+                } else {
+                  widget.player.play();
+                }
+              }
             : null,
         style: TextButton.styleFrom(
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
           primary: Colors.white,
           minimumSize: Size(90, 90),
           backgroundColor: Color(0xFF252223),
@@ -369,171 +377,106 @@ class SeekControl extends TextButton {
     return null;
   }
 
-  SeekControl(AudioPlayer player, [
+  SeekControl(
+    AudioPlayer player, [
     bool forward = false,
     PlaylistController controller,
   ]) : super(
-    onPressed: _resolveAction(controller, forward),
-    style: TextButton.styleFrom(
-      primary: Color(0xFF252223),
-      minimumSize: Size(40, 40),
-    ),
-    child: Icon(
-      forward
-          ? CupertinoIcons.arrow_clockwise
-          : CupertinoIcons.arrow_counterclockwise,
-      size: 40,
-    ),
-  );
+          onPressed: _resolveAction(controller, forward),
+          style: TextButton.styleFrom(
+            primary: Color(0xFF252223),
+            minimumSize: Size(40, 40),
+          ),
+          child: Icon(
+            forward
+                ? CupertinoIcons.arrow_clockwise
+                : CupertinoIcons.arrow_counterclockwise,
+            size: 40,
+          ),
+        );
 }
 
 class PlaylistController extends ChangeNotifier {
-  final List<Module> _songs;
-  var _player = AudioPlayer();
-  int _playlistIndex;
-
-  PlaylistController(this._songs, [this.autoplay = false, int index = 0, int ind = 0]) {
-    _index = ind;
-    _module = _songs[_index];
-    _loadModule(_songs[_index]);
-    _playlistIndex = index;
-  }
-
+  bool repeat;
   Module _module;
-  var _index = 0;
-  var _repeat = AppData().autoplay;
-  var _loading = true;
-  var _playing = false;
+  int currentIndex;
+  List<Module> songs;
 
-  var autoplay = false;
+  StreamSubscription<int> _indexChanged;
+  StreamSubscription<PlayerState> _stateChanged;
 
-  Future _loadModule(Module module) async {
-    try {
-      await http.post(
-        Uri.parse('$apiUrl/courses/modules/${module.id}/mark-listened'),
-        body: jsonEncode({'userId': AppData.user.id}),
-        headers: {'content-type': 'application/json'},
-      );
-      ++module.listened;
-    } catch (e) {
-      print(e);
-    }
+  PlaylistController({this.songs, this.currentIndex}) {
+    repeat = AppData().autoplay;
+    _player.playAll(
+        songs.map((e) => '$apiUrl/courses/modules/' + e.id).toList(),
+        index: currentIndex);
+    _player.seekIndex(currentIndex);
 
-    _module = module;
-    _loading = true;
-    _playing = false;
-    notifyListeners();
-
-    final url = '$apiUrl/courses/modules/' + module.id;
-    AppData.user.unRecommend(module);
-    if (index < _songs.length - 1) {
-      AppData.user.recommend(_songs[index + 1]);
-    } else if (index == _songs.length -1) {
-      if (_playlistIndex == 0) {
-        if (AppData.intermediate.isNotEmpty) {
-          AppData.user.recommend(AppData.intermediate[0]);
-        }
-      } else if (_playlistIndex == 1) {
-        if (AppData.advanced.isNotEmpty) {
-          AppData.user.recommend(AppData.advanced[0]);
-        }
-      } else {
-        if (AppData.beginner.isNotEmpty) {
-          AppData.user.recommend(AppData.beginner[0]);
-        }
-      }
-    }
-
-    _player.setAudioSource(
-      LockCachingAudioSource(Uri.parse(url)),
-      preload: true,
-    );
-    _player.seek(Duration(seconds: 0));
-
-    await _player.durationStream.first;
-    _loading = false;
-
-    if (autoplay) {
-      play();
-    } else {
+    _module = songs[currentIndex];
+    _stateChanged = _player.onPlayerStateChanged.listen((event) {
       notifyListeners();
-    }
-  }
-
-  void play() async {
-    if (!_loading) {
-      _player.play();
-      _playing = true;
-
+    });
+    _indexChanged = _player.onCurrentAudioIndexChanged.listen((event) {
+      _module = songs[event];
       notifyListeners();
-    }
+    });
   }
-
-  void pause() async {
-    if (!_loading) {
-      _player.pause();
-      _playing = false;
-
-      notifyListeners();
-    }
-  }
-
-  Duration get currentDuration => _player.duration;
-
-  Stream<Duration> get progress => _player.positionStream;
-
-  bool get repeat => _repeat;
-
-  bool get loading => _loading;
-
-  bool get playing => _playing;
 
   Module get module => _module;
 
-  List<Module> get modules => _songs;
+  bool canPlayPrev() => currentIndex > 0;
 
-  set repeat(bool value) {
-    _repeat = value;
+  bool canPlayNext() => currentIndex < songs.length - 1;
+
+  void playNext() {
+    if (currentIndex == songs.length - 1 && repeat) {
+      currentIndex = 0;
+      _player.seekIndex(0);
+    } else {
+      ++currentIndex;
+      _player.next();
+    }
     notifyListeners();
   }
 
-  int get index => _index;
-
-  playSpecific(int index) {
-    if (index > -1 && index < _songs.length)
-      _loadModule(_songs[_index = index]);
+  void seekTo(Duration seekTo) {
+    _player.seekPosition(seekTo);
   }
 
-  bool canPlayNext() => index < (_songs.length - 1);
-
-  bool canPlayPrev() => index > 0;
-
-  playPrev() {
-    if (_index > 0) _loadModule(_songs[--_index]);
+  void playSpecific(int index) {
+    currentIndex = index;
+    _player.seekIndex(index);
+    notifyListeners();
   }
 
-  playNext() async {
-    print('I AM HERE');
-    print(index);
-    print(index < _songs.length);
-    if (_index < _songs.length) {
-      _loadModule(_songs[++_index]);
-    } else if (_repeat) {
-      _loadModule(_songs[_index = 0]);
+  bool get playing => _player.playerState == PlayerState.PLAYING;
+
+  bool get loading => _player.playerState == PlayerState.BUFFERING;
+
+  void playPrev() {
+    if (currentIndex == 0) {
+      return;
+    } else {
+      --currentIndex;
+      _player.previous();
     }
+    notifyListeners();
   }
 
-  seekTo(Duration duration) {
-    if (_playing) {
-      _player.seek(duration);
-    }
-  }
+  void pause() => _player.pause();
+
+  void play() => _player.resume();
 
   @override
   void dispose() {
+    _player.release();
     _player.dispose();
+    _stateChanged.cancel();
+    _indexChanged.cancel();
     super.dispose();
   }
+
+  final _player = AudioPlayer();
 }
 
 class UpNextBottomSheet extends StatefulWidget {
@@ -585,27 +528,27 @@ class _UpNextBottomSheetState extends State<UpNextBottomSheet> {
           ),
         ),
         ...(() sync* {
-          for (var i = 0; i < widget.controller.modules.length; ++i) {
+          for (var i = 0; i < widget.controller.songs.length; ++i) {
             final pressed = () {
-              if (widget.controller.index == i) return;
+              if (widget.controller.currentIndex == i) return;
               widget.controller.playSpecific(i);
             };
 
-            if (i < widget.controller.index) {
+            if (i < widget.controller.currentIndex) {
               yield Opacity(
                 opacity: .5,
                 child: ModuleWidget(
-                  widget.controller.modules[i],
+                  widget.controller.songs[i],
                   onPressed: pressed,
-                  playing: i == widget.controller.index,
+                  playing: i == widget.controller.currentIndex,
                   openPlayer: false,
                 ),
               );
             } else {
               yield ModuleWidget(
-                widget.controller.modules[i],
+                widget.controller.songs[i],
                 onPressed: pressed,
-                playing: i == widget.controller.index,
+                playing: i == widget.controller.currentIndex,
                 openPlayer: false,
               );
             }

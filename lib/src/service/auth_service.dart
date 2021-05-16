@@ -24,7 +24,7 @@ class SocialLoginService {
 
     try {
       onComplete((await FirebaseAuth.instance.signInWithCredential(
-              FacebookAuthProvider.credential(token.accessToken.token)))
+              FacebookAuthProvider.credential(token.token)))
           .user);
     } on FirebaseException catch (e) {
       throw e.message;

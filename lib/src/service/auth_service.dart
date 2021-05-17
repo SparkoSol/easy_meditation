@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:easy_meditation/src/base/data.dart';
 import 'package:easy_meditation/src/models/sign_in_request.dart';
 import 'package:easy_meditation/src/models/card.dart' as c;

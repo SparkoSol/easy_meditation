@@ -1,12 +1,12 @@
 import 'package:easy_meditation/src/base/data.dart';
+import 'package:easy_meditation/src/base/locale.dart';
 import 'package:easy_meditation/src/base/pages.dart';
 import 'package:easy_meditation/src/service/ui/lazy_task_service.dart';
 import 'package:easy_meditation/src/service/ui/modal_services.dart';
 import 'package:easy_meditation/src/service/ui/notifications_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
+import 'base/locale.dart';
 import 'base/theme.dart';
 import 'base/config.dart';
 import 'ui/pages/home_page.dart';

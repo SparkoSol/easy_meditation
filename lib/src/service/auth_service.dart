@@ -26,6 +26,13 @@ class SocialLoginService {
               FacebookAuthProvider.credential(token.accessToken.token)))
           .user);
     } on FirebaseException catch (e) {
+      ModalService.scaffoldMessengerKey.currentState
+          .showSnackBar(SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          e.message,
+        ),
+      ));
       throw e.message;
     } catch (e) {
       switch (e.errorCode) {
@@ -47,6 +54,13 @@ class SocialLoginService {
     try {
       authentication = await (await GoogleSignIn().signIn()).authentication;
     } on FirebaseException catch (e) {
+      ModalService.scaffoldMessengerKey.currentState
+          .showSnackBar(SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          e.message,
+        ),
+      ));
       throw (e.message);
     }
 

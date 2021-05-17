@@ -92,6 +92,7 @@ class AppData {
     print(_lastTimeProgress);
 
     _filePath = (await getApplicationDocumentsDirectory()).path + '/data.json';
+
     final file = File(_filePath);
     if (!(await file.exists())) {
       await file.create();

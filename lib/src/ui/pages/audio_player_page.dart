@@ -214,7 +214,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                         timeLeft = controller.currentDuration - timeElapsed;
                       }
 
-                      if (progress == 1) {
+                      if (progress == 1 && !controller._isChanging) {
                         controller.playNext();
                       }
 
@@ -391,6 +391,7 @@ class PlaylistController extends ChangeNotifier {
   final List<Module> _songs;
   var _player = AudioPlayer();
   int _playlistIndex;
+  var _isChanging = false;
 
   PlaylistController(this._songs, [this.autoplay = false, int index = 0, int ind = 0]) {
     _index = ind;
@@ -408,6 +409,8 @@ class PlaylistController extends ChangeNotifier {
   var autoplay = false;
 
   Future _loadModule(Module module) async {
+    _isChanging = true;
+
     try {
       await http.post(
         Uri.parse('$apiUrl/courses/modules/${module.id}/mark-listened'),
@@ -458,6 +461,8 @@ class PlaylistController extends ChangeNotifier {
     } else {
       notifyListeners();
     }
+
+    _isChanging = false;
   }
 
   void play() async {

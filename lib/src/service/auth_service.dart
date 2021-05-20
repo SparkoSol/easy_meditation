@@ -110,7 +110,7 @@ class SocialLoginService {
           final user = r.User()
             ..username = req.username
             ..password = req.password
-            ..name = result.displayName
+            ..name = result.displayName ?? ''
             ..email = req.username
             ..scope = [2];
 

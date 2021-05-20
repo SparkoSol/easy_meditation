@@ -24,9 +24,8 @@ class StripeService {
   static init() {
     StripePayment.setOptions(
         StripeOptions(
-          // Todo: Test
             publishableKey: "pk_live_51IiaqvB65rCJeromqWaKzul6HHmNDg2VzZ2WEL4Xi0tL3ru3okXhzBdjsjwERtq4YanOjfBF1C4CqhYFJaq3PerO00T7ltIwcx",
-            merchantId: "Test",
+            merchantId: "acct_1IiaqvB65rCJerom",
             androidPayMode: 'test'
         )
     );

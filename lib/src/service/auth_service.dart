@@ -35,17 +35,18 @@ class SocialLoginService {
       ));
       throw e.message;
     } catch (e) {
-      switch (e.errorCode) {
-        case FacebookAuthErrorCode.OPERATION_IN_PROGRESS:
-          print("You have a previous login operation in progress");
-          break;
-        case FacebookAuthErrorCode.CANCELLED:
-          onCancel();
-          break;
-        case FacebookAuthErrorCode.FAILED:
-          print("login failed");
-          break;
-      }
+
+      // switch (e.errorCode) {
+      //   case FacebookAuthErrorCode.OPERATION_IN_PROGRESS:
+      //     print("You have a previous login operation in progress");
+      //     break;
+      //   case FacebookAuthErrorCode.CANCELLED:
+      //     onCancel();
+      //     break;
+      //   case FacebookAuthErrorCode.FAILED:
+      //     print("login failed");
+      //     break;
+      // }
     }
   }
 

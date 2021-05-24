@@ -19,8 +19,15 @@ class AudioPlayerPage extends StatefulWidget {
   final List<Module> otherModules;
   final int index;
   final int playingIndex;
+  final bool singleRequested;
 
-  AudioPlayerPage(this.module, [this.otherModules = const [], this.index = 0, this.playingIndex = 0]);
+  AudioPlayerPage(
+    this.module, [
+    this.otherModules = const [],
+    this.index = 0,
+    this.playingIndex = 0,
+    this.singleRequested = false,
+  ]);
 
   @override
   _AudioPlayerPageState createState() => _AudioPlayerPageState();
@@ -34,13 +41,15 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
   @override
   void initState() {
     super.initState();
+    print('IN INIT');
+    print(widget.singleRequested);
     controller = PlaylistController(
       widget.otherModules.isNotEmpty ? widget.otherModules : [widget.module],
       true,
       widget.index,
-      widget.playingIndex
-    )
-      ..addListener(_rebuild);
+      widget.playingIndex,
+      widget.singleRequested,
+    )..addListener(_rebuild);
   }
 
   Module get module => controller.module;
@@ -61,9 +70,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
             size: 30,
             color: AppTheme.darkBlueColor,
           ),
-          onPressed: Navigator
-              .of(context)
-              .pop,
+          onPressed: Navigator.of(context).pop,
         ),
         backgroundColor: Colors.transparent,
         padding: EdgeInsetsDirectional.zero,
@@ -78,11 +85,10 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                 onPressed: () async {
                   showDialog(
                     context: context,
-                    builder: (context) =>
-                        AlertDialog(
-                          title: Text('Description'),
-                          content: Text(module.description),
-                        ),
+                    builder: (context) => AlertDialog(
+                      title: Text('Description'),
+                      content: Text(module.description),
+                    ),
                   );
                 },
                 style: TextButton.styleFrom(
@@ -109,8 +115,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                       module.favorites--;
                       http.delete(
                           Uri.parse(
-                              '$apiUrl/courses/modules/${module
-                                  .id}/unmark-fav'),
+                              '$apiUrl/courses/modules/${module.id}/unmark-fav'),
                           body: jsonEncode({"userId": AppData.user.id}));
                       AppData.favorites.remove(module.id);
                     } else {
@@ -215,7 +220,14 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                       }
 
                       if (progress == 1 && !controller._isChanging) {
-                        controller.playNext();
+                        print('i am here');
+                        print(controller._singleRequested);
+                        print(controller._repeat);
+                        if (controller._singleRequested && controller._repeat) {
+                          controller._player.seek(Duration(seconds: 0));
+                        } else {
+                          controller.playNext();
+                        }
                       }
 
                       return Column(
@@ -232,7 +244,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                           if (controller.loading)
                             Padding(
                               padding:
-                              const EdgeInsets.symmetric(horizontal: 30),
+                                  const EdgeInsets.symmetric(horizontal: 30),
                               child: Row(children: [
                                 Text('--:--'),
                                 Spacer(),
@@ -242,7 +254,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                           else
                             Padding(
                               padding:
-                              const EdgeInsets.symmetric(horizontal: 30),
+                                  const EdgeInsets.symmetric(horizontal: 30),
                               child: Row(children: [
                                 Text(_toTime(timeElapsed)),
                                 Spacer(),
@@ -338,16 +350,16 @@ class _PlayPauseButtonState extends State<PlayPauseButton> {
         child: child,
         onPressed: !widget.player.loading
             ? () {
-          if (widget.player.playing) {
-            widget.player.pause();
-          } else {
-            widget.player.play();
-          }
-        }
+                if (widget.player.playing) {
+                  widget.player.pause();
+                } else {
+                  widget.player.play();
+                }
+              }
             : null,
         style: TextButton.styleFrom(
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
           primary: Colors.white,
           minimumSize: Size(90, 90),
           backgroundColor: Color(0xFF252223),
@@ -369,22 +381,23 @@ class SeekControl extends TextButton {
     return null;
   }
 
-  SeekControl(AudioPlayer player, [
+  SeekControl(
+    AudioPlayer player, [
     bool forward = false,
     PlaylistController controller,
   ]) : super(
-    onPressed: _resolveAction(controller, forward),
-    style: TextButton.styleFrom(
-      primary: Color(0xFF252223),
-      minimumSize: Size(40, 40),
-    ),
-    child: Icon(
-      forward
-          ? CupertinoIcons.arrow_clockwise
-          : CupertinoIcons.arrow_counterclockwise,
-      size: 40,
-    ),
-  );
+          onPressed: _resolveAction(controller, forward),
+          style: TextButton.styleFrom(
+            primary: Color(0xFF252223),
+            minimumSize: Size(40, 40),
+          ),
+          child: Icon(
+            forward
+                ? CupertinoIcons.arrow_clockwise
+                : CupertinoIcons.arrow_counterclockwise,
+            size: 40,
+          ),
+        );
 }
 
 class PlaylistController extends ChangeNotifier {
@@ -393,11 +406,16 @@ class PlaylistController extends ChangeNotifier {
   int _playlistIndex;
   var _isChanging = false;
 
-  PlaylistController(this._songs, [this.autoplay = false, int index = 0, int ind = 0]) {
+  PlaylistController(this._songs,
+      [this.autoplay = false,
+      int index = 0,
+      int ind = 0,
+      bool singleRequested = false]) {
     _index = ind;
     _module = _songs[_index];
     _loadModule(_songs[_index]);
     _playlistIndex = index;
+    _singleRequested = singleRequested;
   }
 
   Module _module;
@@ -405,6 +423,7 @@ class PlaylistController extends ChangeNotifier {
   var _repeat = AppData().autoplay;
   var _loading = true;
   var _playing = false;
+  var _singleRequested = false;
 
   var autoplay = false;
 
@@ -431,7 +450,7 @@ class PlaylistController extends ChangeNotifier {
     AppData.user.unRecommend(module);
     if (index < _songs.length - 1) {
       AppData.user.recommend(_songs[index + 1]);
-    } else if (index == _songs.length -1) {
+    } else if (index == _songs.length - 1) {
       if (_playlistIndex == 0) {
         if (AppData.intermediate.isNotEmpty) {
           AppData.user.recommend(AppData.intermediate[0]);

@@ -25,7 +25,8 @@
   "@minutes": {},
   "meditate": "坐禅",
   "@meditate": {},
-
+  "introductionPart": "介紹",
+  "@introductionPart": {},
   "course": "课程",
   "@course": {},
   "trialAccess": "试用",
@@ -34,7 +35,6 @@
   "@recommendedForYou": {},
   "daysLeft": "剩下天数",
   "@daysLeft": {},
-
   "upgrade": "提升",
   "@upgrade": {},
   "account": "帐户",
@@ -55,14 +55,16 @@
   "@logOut": {},
   "autoLoopMode": "自动重复",
   "@autoLoopMode": {},
+  "accountSettings": "帐户设置",
+  "@accountSettings": {},
 
   "turnOnReminder": "打开提醒",
   "@turnOnReminder": {},
-  "meditateTime": "您几点要禅修",
+  "meditateTime": "您几点要禅",
   "@meditateTime": {},
   "chooseTime": "选择时间",
   "@chooseTime": {},
-  "meditateDay": "您星期几要禅修",
+  "meditateDay": "您星期几要",
   "@meditateDay": {},
 
   "monday": "一",

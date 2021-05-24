@@ -163,7 +163,7 @@ class _PreferencesViewState extends State<PreferencesView> {
                   child: Text('Other', style: AppTheme.sectionHeaderStyle),
                 ),
                 PreferenceTile(
-                    title: '${lang.account} ${lang.settings}',
+                    title: lang.accountSettings,
                     onPressed: () {
                       Navigator.of(context)
                           .push(MaterialPageRoute(builder: (context) {

@@ -137,7 +137,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                                 Navigator.of(context)
                                     .push(MaterialPageRoute(builder: (context) {
                                   return AudioPlayerPage(data[0], data,
-                                      widget.controller.courseId);
+                                      widget.controller.courseId, 0, false);
                                 }));
                               } else {
                                 ModalService.scaffoldMessengerKey.currentState
@@ -252,7 +252,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                       MaterialPageRoute(
                         builder: (context) {
                           return AudioPlayerPage(data[index], data,
-                              widget.controller.courseId, index);
+                              widget.controller.courseId, index, true);
                         },
                       ),
                     );

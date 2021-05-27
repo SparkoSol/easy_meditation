@@ -167,7 +167,7 @@ class SocialLoginService {
       data = jsonDecode(response.body);
       print(data);
       if (data.containsKey('user'))
-        AppData().saveUser(r.User.fromJson(data['user']));
+        AppData().saveUser(r.User.fromJson(data['user'])..name = result.displayName);
       if (data.containsKey('favorites'))
         AppData.favorites.addAll(data['favorites']);
       if (data.containsKey('card'))

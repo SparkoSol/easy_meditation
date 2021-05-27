@@ -25,6 +25,7 @@ class CardDetailsView extends StatefulWidget {
 }
 
 class _CardDetailsViewState extends State<CardDetailsView> {
+  final today = DateTime.now();
   CreditCard card = CreditCard();
   c.Card _card;
   var type = [true, false];
@@ -43,6 +44,9 @@ class _CardDetailsViewState extends State<CardDetailsView> {
       ..cvc = _card?.cvc
       ..expMonth = int.tryParse(date[0])
       ..expYear = int.tryParse(date[1]);
+
+    if (card.expYear == 0) card.expYear = today.year;
+    if (card.expMonth == 0) card.expMonth = today.month;
   }
 
   @override
@@ -104,11 +108,45 @@ class _CardDetailsViewState extends State<CardDetailsView> {
             //Todo
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Expanded(
-                child: DatePickerFormField(
-                  onChanged: (DateTime value) {
-                    card.expMonth = value.month;
-                    card.expYear = value.year;
-                  },
+                child: DropdownButtonFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Year',
+                    contentPadding: const EdgeInsets.all(10),
+                  ),
+                  value: card.expMonth,
+                  items: [
+                    DropdownMenuItem(child: Text('Jan'), value: 1),
+                    DropdownMenuItem(child: Text('Feb'), value: 2),
+                    DropdownMenuItem(child: Text('Mar'), value: 3),
+                    DropdownMenuItem(child: Text('Apr'), value: 4),
+                    DropdownMenuItem(child: Text('May'), value: 5),
+                    DropdownMenuItem(child: Text('Jun'), value: 6),
+                    DropdownMenuItem(child: Text('Jul'), value: 7),
+                    DropdownMenuItem(child: Text('Aug'), value: 8),
+                    DropdownMenuItem(child: Text('Sep'), value: 9),
+                    DropdownMenuItem(child: Text('Oct'), value: 10),
+                    DropdownMenuItem(child: Text('Nov'), value: 11),
+                    DropdownMenuItem(child: Text('Dec'), value: 12),
+                  ],
+                  onChanged: (val) => setState(() => card.expMonth = val),
+                ),
+              ),
+              SizedBox(width: 15),
+              Expanded(
+                child: DropdownButtonFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Year',
+                    contentPadding: const EdgeInsets.all(10),
+                  ),
+                  value: card.expYear,
+                  items: List.generate(30, (index) {
+                    final year = today.year + index;
+                    return DropdownMenuItem(
+                      child: Text(year.toString()),
+                      value: year,
+                    );
+                  }),
+                  onChanged: (val) => setState(() => card.expYear = val),
                 ),
               ),
               SizedBox(width: 15),

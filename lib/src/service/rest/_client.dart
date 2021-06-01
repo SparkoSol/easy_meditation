@@ -1,4 +1,4 @@
-//const apiUrl = 'https://3.17.75.180:4000';
+//const apiUrl = 'https://3.140.51.112:4000';
 const apiUrl = 'https://dashboard.easymeditation.co/api';
 //const apiUrl = 'http://192.168.100.12:4000';
 // import 'package:dio/dio.dart';

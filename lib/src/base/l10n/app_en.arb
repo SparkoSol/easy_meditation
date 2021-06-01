@@ -31,6 +31,8 @@
   "@course": {},
   "trialAccess": "Trial Access",
   "@trialAccess": {},
+  "premiumAccess": "Premium Access",
+  "@premiumAccess": {},
   "recommendedForYou": "Recommended for you",
   "@recommendedForYou": {},
   "daysLeft": "Days Left",

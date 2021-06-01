@@ -31,6 +31,8 @@
   "@course": {},
   "trialAccess": "试用",
   "@trialAccess": {},
+  "premiumAccess": "有薪酬的",
+  "@premiumAccess": {},
   "recommendedForYou": "推荐",
   "@recommendedForYou": {},
   "daysLeft": "剩下天数",

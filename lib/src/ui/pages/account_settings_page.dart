@@ -14,38 +14,36 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: CupertinoNavigationBar(
-        backgroundColor: Colors.transparent,
-        middle: Text('Account Settings'),
-      ),
-      body: LocalizedView(
-        builder: (context, lang) => ColoredBackground(
-          child: Padding(
-            padding: EdgeInsets.only(top: kToolbarHeight + 10),
-            child: Column(children: [
-              Container(
-                margin: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                child: ListTile(
-                  title: Text(lang.autoLoopMode),
-                  trailing: CupertinoSwitch(
-                    value: _appData.autoplay,
-                    onChanged: (val) {
-                      setState(() {
-                        _appData.autoplay = val;
-                      });
-                    },
-                  ),
+    return LocalizedView(
+      builder: (context, lang) => Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: CupertinoNavigationBar(
+          backgroundColor: Colors.transparent,
+          middle: Text(lang.accountSettings),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.only(top: 70),
+          child: Column(children: [
+            Container(
+              margin: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: ListTile(
+                title: Text(lang.autoLoopMode),
+                trailing: CupertinoSwitch(
+                  value: _appData.autoplay,
+                  onChanged: (val) {
+                    setState(() {
+                      _appData.autoplay = val;
+                    });
+                  },
                 ),
               ),
-            ]),
-          ),
+            ),
+          ]),
         ),
       ),
     );

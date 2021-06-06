@@ -47,7 +47,7 @@ class _HomeViewState extends State<HomeView> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 5),
                   child: Text(
-                    '${lang.welcome} ${AppData?.user?.name ?? 'No Name'}',
+                    lang.welcome,
                     style: const TextStyle(
                       fontSize: 22,
                       color: Colors.white,

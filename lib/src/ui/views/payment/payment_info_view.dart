@@ -15,7 +15,7 @@ class PaymentInfoView extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 20, bottom: 15),
             child: Text(
-              'Subscription',
+              'Join Us and Subscribe now',
               style: AppTheme.sectionHeaderStyle,
             ),
           ),

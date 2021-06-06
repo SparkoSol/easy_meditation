@@ -11,6 +11,7 @@ import 'package:easy_meditation/src/ui/views/colored_background.dart';
 import 'package:easy_meditation/src/ui/widgets/preference_tile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class PreferencesView extends StatefulWidget {
   @override
@@ -22,14 +23,6 @@ class _PreferencesViewState extends State<PreferencesView> {
   Widget build(BuildContext context) {
     final transaction = AppData().transaction;
     final lang = AppLocalizations.of(context);
-    final difference = transaction.nextAt.difference(DateTime.now());
-
-    String timeLeft;
-    // if (difference.inDays > 30) {
-    //   timeLeft = (difference.inDays ~/ 30).toString() + ' Months Left';
-    // } else {
-    timeLeft = difference.inDays.toString() + ' Days Left';
-    // }
 
     Color textColor;
     Color backgroundColor;
@@ -40,6 +33,21 @@ class _PreferencesViewState extends State<PreferencesView> {
       textColor = Color(0xFF00AC06);
       backgroundColor = Color(0xFFCFEBD7);
     }
+
+    final canPay = DateTime.now().isAfter(
+      transaction.requiredAt.subtract(Duration(days: 5)),
+    );
+
+    final nextPay = Text.rich(TextSpan(
+      text: 'Next payment at ',
+      style: TextStyle(color: Colors.grey.shade800, fontSize: 13),
+      children: [
+        TextSpan(
+          text: DateFormat('d MMM yyyy').format(transaction.requiredAt),
+          style: TextStyle(fontWeight: FontWeight.bold),
+        )
+      ],
+    ));
 
     return ColoredBackground(
       child: CupertinoPageScaffold(
@@ -61,7 +69,7 @@ class _PreferencesViewState extends State<PreferencesView> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
                   child: Row(children: [
-                    Text(AppData.user.name ?? 'Not Signed in'),
+                    Text(AppData.user.name ?? ''),
                     Spacer(),
                     CircleAvatar(
                       backgroundColor: Colors.white,
@@ -75,9 +83,7 @@ class _PreferencesViewState extends State<PreferencesView> {
                 ),
                 Container(
                   constraints: BoxConstraints.expand(
-                    height: difference.inDays < 5 || transaction.amount == 0
-                        ? 125
-                        : 70,
+                    height: canPay ? 125 : 70,
                   ),
                   decoration: BoxDecoration(
                     color: backgroundColor.withOpacity(.5),
@@ -100,13 +106,10 @@ class _PreferencesViewState extends State<PreferencesView> {
                           ),
                         ),
                         SizedBox(height: 10),
-                        Text(
-                          timeLeft,
-                          style: TextStyle(color: Colors.grey.shade600),
-                        ),
+                        nextPay
                       ] else ...[
                         Text(
-                          lang.trialAccess,
+                          lang.premiumAccess,
                           style: TextStyle(
                             fontSize: 16,
                             color: Color(0xFF00AC06),
@@ -114,15 +117,12 @@ class _PreferencesViewState extends State<PreferencesView> {
                           ),
                         ),
                         SizedBox(height: 10),
-                        Text(
-                          '${transaction.requiredAt.difference(DateTime.now()).inDays} days left',
-                          style: TextStyle(color: Colors.grey.shade600),
-                        ),
+                        nextPay
                       ],
                       Spacer(),
-                      if (difference.inDays < 5 || transaction.amount == 0)
+                      if (canPay)
                         TextButton(
-                          onPressed: () async  {
+                          onPressed: () async {
                             await showModalBottomSheet(
                               context: context,
                               isScrollControlled: true,

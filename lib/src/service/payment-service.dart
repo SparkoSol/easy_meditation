@@ -16,7 +16,8 @@ class StripeTransactionResponse {
 class StripeService {
   static String apiBase = 'https://api.stripe.com/v1';
   static String paymentApiUrl = '$apiBase/payment_intents';
-  static String secret = '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';
+  static String secret = 'sk_test_51H5TD1Hd6Hl6omJ80WMijMFyAWulASFc9q3dEVQCbHnjScWSKksWLbZ5h6bB2RjorJ9sCJxolZ8G72AEawTJ22b200AvBaVNjg';
+  // static String secret = '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';
   static Map<String, String> headers = {
     'Authorization': 'Bearer ${StripeService.secret}',
     'Content-Type': 'application/x-www-form-urlencoded'
@@ -24,9 +25,12 @@ class StripeService {
   static init() {
     StripePayment.setOptions(
         StripeOptions(
-            publishableKey: "pk_live_51IiaqvB65rCJeromqWaKzul6HHmNDg2VzZ2WEL4Xi0tL3ru3okXhzBdjsjwERtq4YanOjfBF1C4CqhYFJaq3PerO00T7ltIwcx",
-            merchantId: "acct_1IiaqvB65rCJerom",
+            publishableKey: "pk_test_51H5TD1Hd6Hl6omJ8y6cuRN5kQThSgh0TLf5Abanb3nOFXo53YcxsmNQOulXour5TmtNAAZule8a4pwi8S4jWZW8A001r9dg6a2",
+            merchantId: "Test",
             androidPayMode: 'test'
+            // publishableKey: "pk_live_51IiaqvB65rCJeromqWaKzul6HHmNDg2VzZ2WEL4Xi0tL3ru3okXhzBdjsjwERtq4YanOjfBF1C4CqhYFJaq3PerO00T7ltIwcx",
+            // merchantId: "acct_1IiaqvB65rCJerom",
+            // androidPayMode: 'test'
         )
     );
   }

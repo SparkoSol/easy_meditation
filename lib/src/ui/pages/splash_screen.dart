@@ -61,14 +61,19 @@ class _SplashScreenState extends State<SplashScreen>
           // }
 
           if (AppData.user != null) {
-            print('$apiUrl/users/${AppData.user?.username}/last-transaction');
-            final response = await http.get(Uri.parse(
-              '$apiUrl/users/${AppData.user?.username}/last-transaction',
-            ));
-            print(response.body);
+            // print('$apiUrl/users/${AppData.user?.username}/last-transaction');
+            // final response = await http.get(Uri.parse(
+            //   '$apiUrl/users/${AppData.user?.username}/last-transaction',
+            // ));
+            // print(response.body);
 
-            AppData().transaction =
-                Transaction.fromJson(jsonDecode(response.body)[0]);
+            AppData().transaction = Transaction()
+              ..amount = 3
+              ..user = AppData.user.username
+              ..createdAt = DateTime.now()
+              ..requiredAt = DateTime.now().add(Duration(days: 30))
+              ..nextAt = DateTime.now().add(Duration(days: 30));
+            // Transaction.fromJson(jsonDecode(response.body)[0]);
           }
 
           if (AppData().isFirst) {

@@ -169,66 +169,24 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                   if (formKey.currentState.validate()) {
                     formKey.currentState.save();
                     await performLazyTask(context, () async {
-                      StripeTransactionResponse response =
-                          await StripeService.payViaExistingCard(
-                        card: card,
-                        amount: '3',
-                      );
+                      final _card = c.Card()
+                        ..type = 'test'
+                        ..cvc = '000'
+                        ..cardNumber = '000000000000'
+                        ..fullName = 'no-name'
+                        ..expiryDate = '${card.expMonth}:${card.expYear}';
 
-                      if (response.success ?? false) {
-                        final transaction = AppData().transaction;
+                      final _transaction = Transaction()
+                        ..amount = 3
+                        ..user = AppData.user.username
+                        ..createdAt = DateTime.now()
+                        ..requiredAt = DateTime.now().add(Duration(days: 30))
+                        ..nextAt = DateTime.now().add(Duration(days: 30));
 
-                        String _type;
-                        if (type[0]) {
-                          _type = 'visa';
-                        } else {
-                          _type = 'master-card';
-                        }
+                      AppData().card = _card;
+                      AppData().transaction = _transaction;
 
-                        final _card = c.Card()
-                          ..type = _type
-                          ..cvc = card.cvc
-                          ..cardNumber = card.number
-                          ..fullName = card.name
-                          ..expiryDate = '${card.expMonth}:${card.expYear}';
-
-                        var response = await http.post(
-                            Uri.parse('$apiUrl/users/${AppData.user.id}/card'),
-                            body: jsonEncode(_card.toJson()),
-                            headers: {'content-type': 'application/json'});
-
-                        final _transaction = Transaction()
-                          ..amount = 3
-                          ..user = AppData.user.username
-                          ..createdAt = DateTime.now()
-                          ..requiredAt = transaction.nextAt
-                          ..nextAt = transaction.nextAt.add(Duration(days: 30));
-
-                        response = await http.post(
-                            Uri.parse('$apiUrl/users/transactions'),
-                            body: jsonEncode(_transaction.toJson()),
-                            headers: {'content-type': 'application/json'});
-
-                        AppData().card = _card;
-                        AppData().transaction = _transaction;
-
-                        widget.onNext();
-
-                        return;
-                      } else {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return Dialog(
-                                child: Text(response.message),
-                              );
-                            });
-                        // print('asdasdasd');
-                        // ModalService.scaffoldMessengerKey.currentState
-                        //     .showSnackBar(
-                        //   SnackBar(content: Text('Some Error Occurred')),
-                        // );
-                      }
+                      widget.onNext();
                     }, message: 'Processing your transaction');
                   } else {
                     setState(() {

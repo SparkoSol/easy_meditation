@@ -6,6 +6,7 @@ import 'package:easy_meditation/src/base/pages.dart';
 import 'package:easy_meditation/src/base/theme.dart';
 import 'package:easy_meditation/src/models/register_request.dart';
 import 'package:easy_meditation/src/models/sign_in_request.dart';
+import 'package:easy_meditation/src/models/transaction.dart';
 import 'package:easy_meditation/src/service/rest/_client.dart';
 import 'package:easy_meditation/src/service/ui/lazy_task_service.dart';
 import 'package:easy_meditation/src/service/ui/modal_services.dart';
@@ -106,6 +107,21 @@ class SignInPage extends StatelessWidget {
 
                     if (AppData.user != null) {
                       if (AppData.user.scope.contains(2)) {
+                        if (AppData.user != null) {
+                          // print('$apiUrl/users/${AppData.user?.username}/last-transaction');
+                          // final response = await http.get(Uri.parse(
+                          //   '$apiUrl/users/${AppData.user?.username}/last-transaction',
+                          // ));
+                          // print(response.body);
+
+                          AppData().transaction = Transaction()
+                            ..amount = 3
+                            ..user = AppData.user.username
+                            ..createdAt = DateTime.now()
+                            ..requiredAt = DateTime.now().add(Duration(days: 30))
+                            ..nextAt = DateTime.now().add(Duration(days: 30));
+                          // Transaction.fromJson(jsonDecode(response.body)[0]);
+                        }
                         Navigator.of(context)
                             .pushNamedAndRemoveUntil('/', (_) => false);
                       } else {

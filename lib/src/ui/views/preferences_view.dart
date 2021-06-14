@@ -62,7 +62,12 @@ class _PreferencesViewState extends State<PreferencesView> {
             ),
           ),
           child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 64, 20, 100),
+            padding: EdgeInsets.fromLTRB(
+              20,
+              MediaQuery.of(context).padding.top + 30,
+              20,
+              100,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -81,83 +86,83 @@ class _PreferencesViewState extends State<PreferencesView> {
                     ),
                   ]),
                 ),
-                Container(
-                  constraints: BoxConstraints.expand(
-                    height: canPay ? 125 : 70,
-                  ),
-                  decoration: BoxDecoration(
-                    color: backgroundColor.withOpacity(.5),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 30,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (transaction.amount == 0) ...[
-                        Text(
-                          lang.trialAccess,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: textColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        nextPay
-                      ] else ...[
-                        Text(
-                          lang.premiumAccess,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFF00AC06),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        nextPay
-                      ],
-                      Spacer(),
-                      if (canPay)
-                        TextButton(
-                          onPressed: () async {
-                            await showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(30),
-                                ),
-                              ),
-                              builder: (context) => PaymentBottomSheet(),
-                            );
-
-                            setState(() {});
-                          },
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(CupertinoIcons.capslock, size: 17),
-                              SizedBox(width: 20),
-                              Text(lang.upgrade)
-                            ],
-                          ),
-                          style: TextButton.styleFrom(
-                            primary: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6)),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 13,
-                              horizontal: 40,
-                            ),
-                            backgroundColor: textColor,
-                          ),
-                        )
-                    ],
-                  ),
-                ),
+                // Container(
+                //   constraints: BoxConstraints.expand(
+                //     height: canPay ? 125 : 70,
+                //   ),
+                //   decoration: BoxDecoration(
+                //     color: backgroundColor.withOpacity(.5),
+                //     borderRadius: BorderRadius.circular(10),
+                //   ),
+                //   padding: const EdgeInsets.symmetric(
+                //     vertical: 10,
+                //     horizontal: 30,
+                //   ),
+                //   child: Column(
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //     children: [
+                //       if (transaction.amount == 0) ...[
+                //         Text(
+                //           lang.trialAccess,
+                //           style: TextStyle(
+                //             fontSize: 16,
+                //             color: textColor,
+                //             fontWeight: FontWeight.bold,
+                //           ),
+                //         ),
+                //         SizedBox(height: 10),
+                //         nextPay
+                //       ] else ...[
+                //         Text(
+                //           lang.premiumAccess,
+                //           style: TextStyle(
+                //             fontSize: 16,
+                //             color: Color(0xFF00AC06),
+                //             fontWeight: FontWeight.bold,
+                //           ),
+                //         ),
+                //         SizedBox(height: 10),
+                //         nextPay
+                //       ],
+                //       Spacer(),
+                //       if (canPay)
+                //         TextButton(
+                //           onPressed: () async {
+                //             await showModalBottomSheet(
+                //               context: context,
+                //               isScrollControlled: true,
+                //               shape: RoundedRectangleBorder(
+                //                 borderRadius: BorderRadius.vertical(
+                //                   top: Radius.circular(30),
+                //                 ),
+                //               ),
+                //               builder: (context) => PaymentBottomSheet(),
+                //             );
+                //
+                //             setState(() {});
+                //           },
+                //           child: Row(
+                //             mainAxisSize: MainAxisSize.min,
+                //             children: [
+                //               Icon(CupertinoIcons.capslock, size: 17),
+                //               SizedBox(width: 20),
+                //               Text(lang.upgrade)
+                //             ],
+                //           ),
+                //           style: TextButton.styleFrom(
+                //             primary: Colors.white,
+                //             shape: RoundedRectangleBorder(
+                //                 borderRadius: BorderRadius.circular(6)),
+                //             padding: const EdgeInsets.symmetric(
+                //               vertical: 13,
+                //               horizontal: 40,
+                //             ),
+                //             backgroundColor: textColor,
+                //           ),
+                //         )
+                //     ],
+                //   ),
+                // ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10, top: 30),
                   child: Text('Other', style: AppTheme.sectionHeaderStyle),

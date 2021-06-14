@@ -22,7 +22,7 @@ class ModuleCard extends StatelessWidget {
 
     Color color;
     dynamic child;
-    var isAllowed = DateTime.now().isBefore(AppData().transaction.requiredAt);
+    var isAllowed = true;//DateTime.now().isBefore(AppData().transaction.requiredAt);
 
     if (index == 0) {
       color = Color(0xFF353961);

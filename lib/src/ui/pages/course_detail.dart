@@ -60,7 +60,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final shouldPay = DateTime.now().isAfter(AppData().transaction.requiredAt);
+    final shouldPay = false;//DateTime.now().isAfter(AppData().transaction.requiredAt);
 
     Color textColor;
     Color headerColor;
